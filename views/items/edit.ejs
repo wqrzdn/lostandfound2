@@ -1,0 +1,513 @@
+<!-- Page Header -->
+<div class="mb-4">
+  <h1>
+    <i class="fas fa-edit text-primary me-2"></i> Edit Item
+  </h1>
+  <p class="text-muted">Update the details of your item.</p>
+</div>
+
+<!-- Item Edit Form -->
+<div class="card">
+  <div class="card-body">
+    <form action="/items/<%= item.id %>?_method=PUT" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+      <div class="row g-3">
+        <!-- Item Type -->
+        <div class="col-md-12 mb-3">
+          <label class="form-label">Item Type*</label>
+          <div class="d-flex">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="type" id="typeLost" value="Lost" <%= item.type === 'Lost' ? 'checked' : '' %> required>
+              <label class="form-check-label" for="typeLost">
+                <i class="fas fa-search text-danger me-1"></i> Lost
+              </label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="type" id="typeFound" value="Found" <%= item.type === 'Found' ? 'checked' : '' %> required>
+              <label class="form-check-label" for="typeFound">
+                <i class="fas fa-hand-holding-heart text-success me-1"></i> Found
+              </label>
+            </div>
+          </div>
+          <div class="invalid-feedback">Please select an item type</div>
+        </div>
+
+        <!-- Item Title -->
+        <div class="col-md-12 mb-3">
+          <label for="title" class="form-label">Item Title*</label>
+          <input type="text" class="form-control" id="title" name="title" value="<%= item.title %>" required>
+          <div class="form-text">Example: "Blue iPhone 13 in black case" or "Gold wedding ring"</div>
+          <div class="invalid-feedback">Please enter an item title</div>
+        </div>
+
+        <!-- Category -->
+        <div class="col-md-6 mb-3">
+          <label for="category" class="form-label">Category*</label>
+          <select class="form-select" id="category" name="category" required>
+            <option value="Phone" <%= item.category === 'Phone' ? 'selected' : '' %>>Phone</option>
+            <option value="Wallet" <%= item.category === 'Wallet' ? 'selected' : '' %>>Wallet</option>
+            <option value="Keys" <%= item.category === 'Keys' ? 'selected' : '' %>>Keys</option>
+            <option value="ID" <%= item.category === 'ID' ? 'selected' : '' %>>ID</option>
+            <option value="Bag" <%= item.category === 'Bag' ? 'selected' : '' %>>Bag</option>
+            <option value="Jewelry" <%= item.category === 'Jewelry' ? 'selected' : '' %>>Jewelry</option>
+            <option value="Clothing" <%= item.category === 'Clothing' ? 'selected' : '' %>>Clothing</option>
+            <option value="Electronics" <%= item.category === 'Electronics' ? 'selected' : '' %>>Electronics</option>
+            <option value="Book" <%= item.category === 'Book' ? 'selected' : '' %>>Book</option>
+            <option value="Other" <%= item.category === 'Other' ? 'selected' : '' %>>Other</option>
+          </select>
+          <div class="invalid-feedback">Please select a category</div>
+        </div>
+
+        <!-- Date -->
+        <div class="col-md-6 mb-3">
+          <label for="date" class="form-label">Date*</label>
+          <input type="date" class="form-control" id="date" name="date" value="<%= item.date %>" required>
+          <div class="form-text">Date when the item was lost or found</div>
+          <div class="invalid-feedback">Please select a date</div>
+        </div>
+
+        <!-- Location Section -->
+        <div class="col-md-12 mb-3">
+          <h5><i class="fas fa-map-marker-alt me-2"></i>Location Details*</h5>
+          <div class="location-fields border rounded p-3">
+            <div class="row g-3">
+              <!-- Country -->
+              <div class="col-md-6 mb-2">
+                <label for="country" class="form-label">Country*</label>
+                <select class="form-select" id="country" name="country" required>
+                  <option value="" disabled>Select a country</option>
+                  <!-- Will be populated with JavaScript -->
+                </select>
+                <div class="invalid-feedback">Please select a country</div>
+              </div>
+
+              <!-- State/Province -->
+              <div class="col-md-6 mb-2">
+                <label for="state" class="form-label">State/Province*</label>
+                <select class="form-select" id="state" name="state" required>
+                  <option value="" disabled>Select a state/province</option>
+                  <!-- Will be populated with JavaScript -->
+                </select>
+                <div class="invalid-feedback">Please select a state/province</div>
+              </div>
+
+              <!-- City -->
+              <div class="col-md-6 mb-2">
+                <label for="city" class="form-label">City*</label>
+                <div class="input-group">
+                  <select class="form-select" id="city" name="city" required style="flex: 1 1 auto;">
+                    <option value="" disabled>Select a city</option>
+                    <!-- Will be populated with JavaScript -->
+                  </select>
+                  <button class="btn btn-outline-secondary" type="button" id="toggleCityInput">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                </div>
+                <div id="citySearchContainer" class="mt-2" style="display: none;">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="citySearch" placeholder="Type city name...">
+                    <button class="btn btn-outline-primary" type="button" id="saveCitySearch">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </div>
+                  <small class="form-text text-muted">Can't find your city? Type it here</small>
+                </div>
+                <div class="invalid-feedback">Please select or enter a city</div>
+              </div>
+
+              <!-- Locality/Area (optional) -->
+              <div class="col-md-6 mb-2" id="localityContainer">
+                <label for="locality" class="form-label">Area/Locality</label>
+                <select class="form-select" id="locality" name="locality">
+                  <option value="">Select an area (optional)</option>
+                  <!-- Will be populated with JavaScript -->
+                </select>
+              </div>
+
+              <!-- Specific Location -->
+              <div class="col-md-12">
+                <label for="location" class="form-label">Specific Location Details</label>
+                <input type="text" class="form-control" id="location" name="location" placeholder="Specific details about the location" value="<%= item.location %>">
+                <div class="form-text">Add any additional details that would help locate the exact spot</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-md-12 mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="4"><%= item.description %></textarea>
+          <div class="form-text">Include identifying features, markings, contents, or any other details that might help with identification</div>
+        </div>
+
+        <!-- Current Images -->
+        <% if (item.image1 || item.image2) { %>
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Current Images</label>
+            <div class="row">
+              <% if (item.image1) { %>
+                <div class="col-6 col-md-3 mb-2">
+                  <img src="<%= item.image1 %>" class="img-thumbnail" alt="Current image 1">
+                </div>
+              <% } %>
+              <% if (item.image2) { %>
+                <div class="col-6 col-md-3 mb-2">
+                  <img src="<%= item.image2 %>" class="img-thumbnail" alt="Current image 2">
+                </div>
+              <% } %>
+            </div>
+            <div class="form-text">Upload new images below to replace these</div>
+          </div>
+        <% } %>
+
+        <!-- New Images -->
+        <div class="col-md-12 mb-3">
+          <label for="images" class="form-label">Upload New Images (Maximum 2)</label>
+          <input type="file" class="form-control" id="images" name="images" accept="image/*" multiple>
+          <div class="form-text">Upload clear images of the item (if applicable). Max file size: 5MB. Uploading new images will replace the existing ones.</div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-md-12 mb-3">
+          <label for="contact" class="form-label">Contact Information*</label>
+          <input type="text" class="form-control" id="contact" name="contact" value="<%= item.contact %>" required>
+          <div class="form-text">How others can reach you regarding this item</div>
+          <div class="invalid-feedback">Please provide contact information</div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="col-12">
+          <hr>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="/items/<%= item.id %>" class="btn btn-outline-secondary me-md-2">Cancel</a>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Store the current location values to use in JavaScript -->
+      <input type="hidden" id="currentCountry" value="<%= item.country || '' %>">
+      <input type="hidden" id="currentState" value="<%= item.state || '' %>">
+      <input type="hidden" id="currentCity" value="<%= item.city || '' %>">
+      <input type="hidden" id="currentLocality" value="<%= item.locality || '' %>">
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const countrySelect = document.getElementById('country');
+    const stateSelect = document.getElementById('state');
+    const citySelect = document.getElementById('city');
+    const localitySelect = document.getElementById('locality');
+    const localityContainer = document.getElementById('localityContainer');
+    
+    // Get current location values
+    const currentCountry = document.getElementById('currentCountry').value;
+    const currentState = document.getElementById('currentState').value;
+    const currentCity = document.getElementById('currentCity').value;
+    const currentLocality = document.getElementById('currentLocality').value;
+    
+    // City search elements
+    const toggleCityInputBtn = document.getElementById('toggleCityInput');
+    const citySearchContainer = document.getElementById('citySearchContainer');
+    const citySearchInput = document.getElementById('citySearch');
+    const saveCitySearchBtn = document.getElementById('saveCitySearch');
+    
+    // Track if we're using custom city input
+    let isUsingCustomCity = false;
+    
+    // Toggle between dropdown and search input for city
+    toggleCityInputBtn.addEventListener('click', function() {
+      isUsingCustomCity = !isUsingCustomCity;
+      citySearchContainer.style.display = isUsingCustomCity ? 'block' : 'none';
+      
+      if (isUsingCustomCity) {
+        // Focus the search input when shown
+        citySearchInput.focus();
+        citySearchInput.value = currentCity; // Pre-fill with current city
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-list"></i>'; // Change icon to list
+        toggleCityInputBtn.title = "Switch to dropdown selection";
+      } else {
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>'; // Change icon back to pencil
+        toggleCityInputBtn.title = "Enter city manually";
+      }
+    });
+    
+    // Save the custom city input
+    saveCitySearchBtn.addEventListener('click', function() {
+      const cityName = citySearchInput.value.trim();
+      if (cityName) {
+        // Clear existing options and add the custom city
+        citySelect.innerHTML = '';
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.disabled = true;
+        defaultOption.textContent = "Select a city";
+        citySelect.appendChild(defaultOption);
+        
+        const customOption = document.createElement('option');
+        customOption.value = `custom_${cityName}`;
+        customOption.textContent = cityName;
+        customOption.selected = true;
+        citySelect.appendChild(customOption);
+        
+        // Hide the search container after saving
+        citySearchContainer.style.display = 'none';
+        isUsingCustomCity = false;
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+        
+        // Enable the select and make it show the selected value
+        citySelect.disabled = false;
+      }
+    });
+    
+    // Also save city on enter key
+    citySearchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent form submission
+        saveCitySearchBtn.click();
+      }
+    });
+    
+    // Enhanced loading indicators
+    function showLoading(selectElement) {
+      selectElement.disabled = true;
+      selectElement.innerHTML = '<option value="" disabled>Loading...</option>';
+    }
+    
+    function showError(selectElement, message = 'Error loading data') {
+      let currentOptions = selectElement.innerHTML;
+      selectElement.innerHTML = `<option value="" disabled>${message}</option>` + currentOptions;
+    }
+    
+    // Fetch countries
+    async function fetchCountries() {
+      showLoading(countrySelect);
+      
+      try {
+        const response = await fetch('/api/countries');
+        if (!response.ok) throw new Error('Failed to fetch countries');
+        
+        const countries = await response.json();
+        
+        countrySelect.innerHTML = '<option value="" disabled>Select a country</option>';
+        
+        // Track if we found the current country
+        let foundCurrentCountry = false;
+        
+        countries.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country.code;
+          option.textContent = country.name;
+          // Mark as selected if this matches the current country name
+          if (country.name === currentCountry) {
+            option.selected = true;
+            foundCurrentCountry = true;
+          }
+          countrySelect.appendChild(option);
+        });
+        
+        countrySelect.disabled = false;
+        
+        // If we found the country, load its states
+        if (foundCurrentCountry) {
+          const selectedCountryOption = countrySelect.options[countrySelect.selectedIndex];
+          fetchStates(selectedCountryOption.value);
+        }
+      } catch (error) {
+        console.error('Error loading countries:', error);
+        showError(countrySelect, 'Error loading countries');
+      }
+    }
+    
+    // Fetch states for a country
+    async function fetchStates(countryCode) {
+      showLoading(stateSelect);
+      citySelect.innerHTML = '<option value="" disabled>Select a city</option>';
+      citySelect.disabled = true;
+      localitySelect.innerHTML = '<option value="">Select an area (optional)</option>';
+      localitySelect.disabled = true;
+      
+      try {
+        const response = await fetch(`/api/states/${countryCode}`);
+        if (!response.ok) throw new Error('Failed to fetch states');
+        
+        const states = await response.json();
+        
+        stateSelect.innerHTML = '<option value="" disabled>Select a state/province</option>';
+        
+        // Track if we found the current state
+        let foundCurrentState = false;
+        
+        states.forEach(state => {
+          const option = document.createElement('option');
+          option.value = state.code;
+          option.textContent = state.name;
+          // Mark as selected if this matches the current state name
+          if (state.name === currentState) {
+            option.selected = true;
+            foundCurrentState = true;
+          }
+          stateSelect.appendChild(option);
+        });
+        
+        stateSelect.disabled = states.length === 0;
+        
+        if (states.length === 0) {
+          stateSelect.innerHTML = '<option value="" disabled>No states/provinces available</option>';
+        }
+        
+        // If we found the state, load its cities
+        if (foundCurrentState) {
+          fetchCities(countryCode, stateSelect.value);
+        }
+      } catch (error) {
+        console.error(`Error loading states for ${countryCode}:`, error);
+        showError(stateSelect, 'Error loading states/provinces');
+      }
+    }
+    
+    // Fetch cities for a state
+    async function fetchCities(countryCode, regionCode) {
+      showLoading(citySelect);
+      localitySelect.innerHTML = '<option value="">Select an area (optional)</option>';
+      localitySelect.disabled = true;
+      localityContainer.style.display = 'none';
+      
+      try {
+        const response = await fetch(`/api/cities/${countryCode}/${regionCode}`);
+        if (!response.ok) throw new Error('Failed to fetch cities');
+        
+        const cities = await response.json();
+        
+        citySelect.innerHTML = '<option value="" disabled>Select a city</option>';
+        
+        // Track if we found the current city
+        let foundCurrentCity = false;
+        
+        cities.forEach(city => {
+          const option = document.createElement('option');
+          option.value = city.code;
+          option.textContent = city.name;
+          // Mark as selected if this matches the current city name
+          if (city.name === currentCity) {
+            option.selected = true;
+            foundCurrentCity = true;
+          }
+          citySelect.appendChild(option);
+        });
+        
+        // If current city is not in the list, add it
+        if (!foundCurrentCity && currentCity) {
+          const customOption = document.createElement('option');
+          customOption.value = `custom_${currentCity}`;
+          customOption.textContent = currentCity;
+          customOption.selected = true;
+          citySelect.appendChild(customOption);
+        }
+        
+        citySelect.disabled = cities.length === 0 && !currentCity;
+        
+        if (cities.length === 0 && !currentCity) {
+          citySelect.innerHTML = '<option value="" disabled>No cities available - use search</option>';
+        }
+        
+        // Show toggle button regardless
+        toggleCityInputBtn.style.display = 'block';
+        
+        // For localities, since we don't have an API endpoint, just display the container
+        // if we have a locality value stored
+        if (currentLocality) {
+          localityContainer.style.display = 'block';
+          const option = document.createElement('option');
+          option.value = currentLocality;
+          option.textContent = currentLocality;
+          option.selected = true;
+          localitySelect.appendChild(option);
+          localitySelect.disabled = false;
+        }
+      } catch (error) {
+        console.error(`Error loading cities for ${countryCode}/${regionCode}:`, error);
+        showError(citySelect, 'Error loading cities');
+        
+        // If we have a current city, add it despite the error
+        if (currentCity) {
+          const customOption = document.createElement('option');
+          customOption.value = `custom_${currentCity}`;
+          customOption.textContent = currentCity;
+          customOption.selected = true;
+          citySelect.appendChild(customOption);
+          citySelect.disabled = false;
+        }
+        
+        toggleCityInputBtn.style.display = 'block';
+      }
+    }
+    
+    // Event listeners for cascading dropdowns
+    countrySelect.addEventListener('change', function() {
+      const countryCode = this.value;
+      if (countryCode) {
+        fetchStates(countryCode);
+      }
+    });
+    
+    stateSelect.addEventListener('change', function() {
+      const countryCode = countrySelect.value;
+      const regionCode = this.value;
+      if (countryCode && regionCode) {
+        fetchCities(countryCode, regionCode);
+      }
+    });
+    
+    // Override the form submission to use the display names rather than codes
+    document.querySelector('form').addEventListener('submit', function(e) {
+      // Create hidden fields to store the display names
+      if (countrySelect.value) {
+        const selectedCountry = countrySelect.options[countrySelect.selectedIndex];
+        const countryNameInput = document.createElement('input');
+        countryNameInput.type = 'hidden';
+        countryNameInput.name = 'countryName';
+        countryNameInput.value = selectedCountry.textContent;
+        this.appendChild(countryNameInput);
+      }
+      
+      if (stateSelect.value) {
+        const selectedState = stateSelect.options[stateSelect.selectedIndex];
+        const stateNameInput = document.createElement('input');
+        stateNameInput.type = 'hidden';
+        stateNameInput.name = 'stateName';
+        stateNameInput.value = selectedState.textContent;
+        this.appendChild(stateNameInput);
+      }
+      
+      if (citySelect.value) {
+        const selectedCity = citySelect.options[citySelect.selectedIndex];
+        const cityNameInput = document.createElement('input');
+        cityNameInput.type = 'hidden';
+        cityNameInput.name = 'cityName';
+        cityNameInput.value = selectedCity.textContent;
+        this.appendChild(cityNameInput);
+      }
+    });
+    
+    // Initialize countries on page load
+    fetchCountries();
+    
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      form.classList.add('was-validated');
+    }, false);
+  });
+</script> 

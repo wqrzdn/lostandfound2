@@ -1,0 +1,455 @@
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="mb-5 text-center">
+    <h1 class="fw-bold mb-3">
+      <% if (typeof req !== 'undefined' && req.query.type === 'Found') { %>
+        <i class="fas fa-hand-holding-heart text-success me-2"></i> Report Found Item
+      <% } else if (typeof req !== 'undefined' && req.query.type === 'Lost') { %>
+        <i class="fas fa-search text-danger me-2"></i> Report Lost Item
+      <% } else { %>
+        <i class="fas fa-plus text-primary me-2"></i> Post New Item
+      <% } %>
+    </h1>
+    <p class="text-muted col-lg-8 mx-auto">Please fill out the form below with as much detail as possible to increase the chances of finding a match.</p>
+  </div>
+
+  <!-- Item Form -->
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-sm rounded-3 border-0">
+        <div class="card-body p-4 p-lg-5">
+          <form action="/items" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <div class="row g-4">
+              <!-- Item Type -->
+              <div class="col-12 mb-2">
+                <label class="form-label fw-semibold">Item Type*</label>
+                <div class="d-flex gap-4">
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="typeLost" value="Lost" <%= (typeof req !== 'undefined' && req.query.type === 'Lost') ? 'checked' : '' %> required>
+                    <label class="form-check-label d-flex align-items-center" for="typeLost">
+                      <span class="badge bg-danger rounded-pill d-inline-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                        <i class="fas fa-search fa-sm"></i>
+                      </span>
+                      <span class="fw-medium">Lost Item</span>
+                    </label>
+                  </div>
+                  <div class="form-check custom-radio">
+                    <input class="form-check-input" type="radio" name="type" id="typeFound" value="Found" <%= (typeof req !== 'undefined' && req.query.type === 'Found') ? 'checked' : '' %> required>
+                    <label class="form-check-label d-flex align-items-center" for="typeFound">
+                      <span class="badge bg-success rounded-pill d-inline-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                        <i class="fas fa-hand-holding-heart fa-sm"></i>
+                      </span>
+                      <span class="fw-medium">Found Item</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="invalid-feedback">Please select an item type</div>
+              </div>
+
+              <!-- Item Title -->
+              <div class="col-12 mb-2">
+                <label for="title" class="form-label fw-semibold">Item Title*</label>
+                <input type="text" class="form-control form-control-lg rounded-3 border-light-subtle" id="title" name="title" placeholder="Brief description of the item" required>
+                <div class="form-text small mt-2">
+                  <i class="fas fa-lightbulb text-warning me-1"></i>
+                  Example: "Blue iPhone 13 in black case" or "Gold wedding ring"
+                </div>
+                <div class="invalid-feedback">Please enter an item title</div>
+              </div>
+
+              <div class="col-md-6 mb-2">
+                <label for="category" class="form-label fw-semibold">Category*</label>
+                <select class="form-select rounded-3 border-light-subtle" id="category" name="category" required>
+                  <option value="" selected disabled>Select a category</option>
+                  <option value="Phone">Phone</option>
+                  <option value="Wallet">Wallet</option>
+                  <option value="Keys">Keys</option>
+                  <option value="ID">ID</option>
+                  <option value="Bag">Bag</option>
+                  <option value="Jewelry">Jewelry</option>
+                  <option value="Clothing">Clothing</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Book">Book</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div class="invalid-feedback">Please select a category</div>
+              </div>
+
+              <!-- Date -->
+              <div class="col-md-6 mb-2">
+                <label for="date" class="form-label fw-semibold">Date*</label>
+                <input type="date" class="form-control rounded-3 border-light-subtle" id="date" name="date" required>
+                <div class="form-text small mt-1">Date when the item was lost or found</div>
+                <div class="invalid-feedback">Please select a date</div>
+              </div>
+
+              <!-- Location Section -->
+              <div class="col-12 mb-2">
+                <div class="location-fields bg-light rounded-3 p-4 mt-3">
+                  <h5 class="fw-semibold mb-4">
+                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Location Details*
+                  </h5>
+                  <div class="row g-4">
+                    <!-- Country -->
+                    <div class="col-md-6 mb-1">
+                      <label for="country" class="form-label fw-medium">Country*</label>
+                      <div class="position-relative">
+                        <select class="form-select rounded-3 border-light-subtle" id="country" name="country" required>
+                          <option value="" selected disabled>Select a country</option>
+                          <!-- Will be populated with JavaScript -->
+                        </select>
+                        <div class="position-absolute top-0 end-0 px-3 py-2">
+                          <div class="spinner-border spinner-border-sm text-primary d-none" id="country-loading" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="invalid-feedback">Please select a country</div>
+                    </div>
+
+                    <!-- State/Province -->
+                    <div class="col-md-6 mb-1">
+                      <label for="state" class="form-label fw-medium">State/Province*</label>
+                      <div class="position-relative">
+                        <select class="form-select rounded-3 border-light-subtle" id="state" name="state" required disabled>
+                          <option value="" selected disabled>Select a state/province</option>
+                          <!-- Will be populated with JavaScript -->
+                        </select>
+                        <div class="position-absolute top-0 end-0 px-3 py-2">
+                          <div class="spinner-border spinner-border-sm text-primary d-none" id="state-loading" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="invalid-feedback">Please select a state/province</div>
+                    </div>
+
+                    <!-- City -->
+                    <div class="col-md-6 mb-1">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <label for="city" class="form-label fw-medium">City*</label>
+                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0" id="toggleCityInput" title="Enter city manually">
+                          <i class="fas fa-pencil-alt"></i> Manual Entry
+                        </button>
+                      </div>
+                      <div class="position-relative">
+                        <select class="form-select rounded-3 border-light-subtle" id="city" name="city" required disabled>
+                          <option value="" selected disabled>Select a city</option>
+                          <!-- Will be populated with JavaScript -->
+                        </select>
+                        <div class="position-absolute top-0 end-0 px-3 py-2">
+                          <div class="spinner-border spinner-border-sm text-primary d-none" id="city-loading" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div id="citySearchContainer" class="mt-2" style="display: none;">
+                        <div class="input-group">
+                          <input type="text" class="form-control rounded-start-3 border-light-subtle" id="citySearch" placeholder="Type city name...">
+                          <button class="btn btn-outline-primary rounded-end-3" type="button" id="saveCitySearch">
+                            <i class="fas fa-check"></i>
+                          </button>
+                        </div>
+                        <small class="form-text text-muted">Can't find your city? Type it here</small>
+                      </div>
+                      <div class="invalid-feedback">Please select or enter a city</div>
+                    </div>
+
+                    <!-- Locality/Area (optional) -->
+                    <div class="col-md-6 mb-1" id="localityContainer" style="display: none;">
+                      <label for="locality" class="form-label fw-medium">Area/Locality</label>
+                      <select class="form-select rounded-3 border-light-subtle" id="locality" name="locality" disabled>
+                        <option value="" selected>Select an area (optional)</option>
+                        <!-- Will be populated with JavaScript -->
+                      </select>
+                    </div>
+
+                    <!-- Specific Location -->
+                    <div class="col-12">
+                      <label for="location" class="form-label fw-medium">Specific Location Details</label>
+                      <input type="text" class="form-control rounded-3 border-light-subtle" id="location" name="location" placeholder="Specific details about the location (e.g., 'near the fountain', 'inside the library')">
+                      <div class="form-text small mt-1">Add any additional details that would help locate the exact spot</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="col-12 mb-2">
+                <label for="description" class="form-label fw-semibold">Description</label>
+                <textarea class="form-control rounded-3 border-light-subtle" id="description" name="description" rows="4" placeholder="Detailed description of the item"></textarea>
+                <div class="form-text small mt-1">Include identifying features, markings, contents, or any other details that might help with identification</div>
+              </div>
+
+              <!-- Images -->
+              <div class="col-12 mb-2">
+                <label for="images" class="form-label fw-semibold">Images (Maximum 2)</label>
+                <input type="file" class="form-control rounded-3 border-light-subtle" id="images" name="images" accept="image/*" multiple>
+                <div class="form-text small mt-1">
+                  <i class="fas fa-image text-muted me-1"></i>
+                  Upload clear images of the item (if applicable). Max file size: 5MB.
+                </div>
+              </div>
+
+              <!-- Contact Information -->
+              <div class="col-12 mb-2">
+                <label for="contact" class="form-label fw-semibold">Contact Information*</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white border-light-subtle rounded-start-3">
+                    <i class="fas fa-envelope text-muted"></i>
+                  </span>
+                  <input type="text" class="form-control border-start-0 rounded-end-3 border-light-subtle" id="contact" name="contact" placeholder="Email address or phone number" required>
+                </div>
+                <div class="form-text small mt-1">How others can reach you regarding this item</div>
+                <div class="invalid-feedback">Please provide contact information</div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="col-12 mt-4">
+                <hr>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end mt-4">
+                  <a href="/items" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Items
+                  </a>
+                  <button type="submit" class="btn btn-primary rounded-pill px-4 py-2">
+                    <i class="fas fa-paper-plane me-2"></i> Post Item
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Custom form styling */
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+  }
+  
+  /* Custom radio buttons */
+  .custom-radio .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.15em;
+  }
+  
+  .custom-radio .form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  /* Spinner */
+  .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+  
+  /* Location fields section */
+  .location-fields {
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const countrySelect = document.getElementById('country');
+    const stateSelect = document.getElementById('state');
+    const citySelect = document.getElementById('city');
+    const localitySelect = document.getElementById('locality');
+    const localityContainer = document.getElementById('localityContainer');
+    
+    // City search elements
+    const toggleCityInputBtn = document.getElementById('toggleCityInput');
+    const citySearchContainer = document.getElementById('citySearchContainer');
+    const citySearchInput = document.getElementById('citySearch');
+    const saveCitySearchBtn = document.getElementById('saveCitySearch');
+    
+    // Loading indicators
+    const countryLoading = document.getElementById('country-loading');
+    const stateLoading = document.getElementById('state-loading');
+    const cityLoading = document.getElementById('city-loading');
+    
+    // Track if we're using custom city input
+    let isUsingCustomCity = false;
+    
+    // Toggle between dropdown and search input for city
+    toggleCityInputBtn.addEventListener('click', function() {
+      isUsingCustomCity = !isUsingCustomCity;
+      citySearchContainer.style.display = isUsingCustomCity ? 'block' : 'none';
+      
+      if (isUsingCustomCity) {
+        // Focus the search input when shown
+        citySearchInput.focus();
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-list"></i> Use Dropdown';
+      } else {
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-pencil-alt"></i> Manual Entry';
+      }
+    });
+    
+    // Save the custom city input
+    saveCitySearchBtn.addEventListener('click', function() {
+      const cityName = citySearchInput.value.trim();
+      if (cityName) {
+        // Clear existing options and add the custom city
+        citySelect.innerHTML = '';
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "Select a city";
+        defaultOption.disabled = true;
+        citySelect.appendChild(defaultOption);
+        
+        const customOption = document.createElement('option');
+        customOption.value = cityName;
+        customOption.textContent = cityName;
+        customOption.selected = true;
+        citySelect.appendChild(customOption);
+        
+        // Hide the search container after saving
+        citySearchContainer.style.display = 'none';
+        isUsingCustomCity = false;
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-pencil-alt"></i> Manual Entry';
+        
+        // Enable the select
+        citySelect.disabled = false;
+      }
+    });
+    
+    // Also save city on enter key
+    citySearchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent form submission
+        saveCitySearchBtn.click();
+      }
+    });
+    
+    // Enhanced loading indicators
+    function showLoading(element) {
+      if (element === countrySelect) countryLoading.classList.remove('d-none');
+      if (element === stateSelect) stateLoading.classList.remove('d-none');
+      if (element === citySelect) cityLoading.classList.remove('d-none');
+      element.disabled = true;
+    }
+    
+    function hideLoading(element) {
+      if (element === countrySelect) countryLoading.classList.add('d-none');
+      if (element === stateSelect) stateLoading.classList.add('d-none');
+      if (element === citySelect) cityLoading.classList.add('d-none');
+      element.disabled = false;
+    }
+    
+    // Fetch countries on page load
+    async function fetchCountries() {
+      try {
+        showLoading(countrySelect);
+        const response = await fetch('/api/countries');
+        const countries = await response.json();
+        
+        countries.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country.name;
+          option.dataset.code = country.code;
+          option.textContent = country.name;
+          countrySelect.appendChild(option);
+        });
+        
+        hideLoading(countrySelect);
+      } catch (error) {
+        console.error('Error loading countries:', error);
+        countrySelect.innerHTML += '<option value="" disabled>Error loading countries</option>';
+        hideLoading(countrySelect);
+      }
+    }
+    
+    // Fetch states when country is selected
+    countrySelect.addEventListener('change', async function() {
+      stateSelect.innerHTML = '<option value="" selected disabled>Select a state/province</option>';
+      citySelect.innerHTML = '<option value="" selected disabled>Select a city</option>';
+      
+      stateSelect.disabled = true;
+      citySelect.disabled = true;
+      
+      const selectedOption = this.options[this.selectedIndex];
+      const countryCode = selectedOption.dataset.code;
+      
+      try {
+        showLoading(stateSelect);
+        const response = await fetch(`/api/states/${countryCode}`);
+        const states = await response.json();
+        
+        states.forEach(state => {
+          const option = document.createElement('option');
+          option.value = state.name;
+          option.dataset.code = state.code || '';
+          option.textContent = state.name;
+          stateSelect.appendChild(option);
+        });
+        
+        stateSelect.disabled = states.length === 0;
+        hideLoading(stateSelect);
+        
+        // Show the toggle city input button for manual entry
+        toggleCityInputBtn.style.display = 'block';
+      } catch (error) {
+        console.error('Error loading states:', error);
+        stateSelect.innerHTML += '<option value="" disabled>Error loading states</option>';
+        hideLoading(stateSelect);
+      }
+    });
+    
+    // Fetch cities when state is selected
+    stateSelect.addEventListener('change', async function() {
+      citySelect.innerHTML = '<option value="" selected disabled>Select a city</option>';
+      citySelect.disabled = true;
+      
+      const countryOption = countrySelect.options[countrySelect.selectedIndex];
+      const stateOption = this.options[this.selectedIndex];
+      
+      const countryCode = countryOption.dataset.code;
+      const stateCode = stateOption.dataset.code;
+      
+      try {
+        showLoading(citySelect);
+        const response = await fetch(`/api/cities/${countryCode}/${stateCode}`);
+        const cities = await response.json();
+        
+        cities.forEach(city => {
+          const option = document.createElement('option');
+          option.value = city.name;
+          option.textContent = city.name;
+          citySelect.appendChild(option);
+        });
+        
+        citySelect.disabled = cities.length === 0;
+        hideLoading(citySelect);
+      } catch (error) {
+        console.error('Error loading cities:', error);
+        citySelect.innerHTML += '<option value="" disabled>Error loading cities</option>';
+        hideLoading(citySelect);
+      }
+    });
+    
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      
+      form.classList.add('was-validated');
+    });
+    
+    // Initialize
+    fetchCountries();
+  });
+</script> 

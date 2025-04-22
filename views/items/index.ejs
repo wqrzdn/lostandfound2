@@ -1,0 +1,646 @@
+<!-- Page Header -->
+<div class="container-fluid py-4 mb-4 bg-light border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="fw-bold">
+        <% if (type === 'Lost') { %>
+          <i class="fas fa-search text-danger me-2"></i> Lost Items
+        <% } else if (type === 'Found') { %>
+          <i class="fas fa-hand-holding-heart text-success me-2"></i> Found Items
+        <% } else { %>
+          <i class="fas fa-list text-primary me-2"></i> Browse Items
+        <% } %>
+      </h1>
+      <a href="/items/new" class="btn btn-primary rounded-pill px-4">
+        <i class="fas fa-plus me-2"></i> Post New Item
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <% if (locals.error) { %>
+    <div class="alert alert-danger mb-4 shadow-sm">
+      <i class="fas fa-exclamation-triangle me-2"></i> <%= error %>
+    </div>
+  <% } %>
+
+  <% if (locals.message) { %>
+    <div class="alert alert-success mb-4 shadow-sm">
+      <i class="fas fa-info-circle me-2"></i> <%= message %>
+    </div>
+  <% } %>
+
+  <div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3 mb-4">
+      <div class="card shadow-sm rounded-3 border-0 mb-4">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+          <h5 class="mb-0 fw-bold">
+            <i class="fas fa-filter text-primary me-2"></i> Filter Items
+          </h5>
+          <button class="btn btn-sm btn-link text-decoration-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+        <div class="collapse show" id="filterCollapse">
+          <div class="card-body">
+            <form action="/items" method="GET" class="row g-3" id="filter-form">
+              <!-- Type Filter -->
+              <div class="col-12">
+                <label for="type" class="form-label fw-semibold">Item Type</label>
+                <select name="type" id="type" class="form-select form-select-sm rounded-pill border-light-subtle">
+                  <option value="">All Types</option>
+                  <option value="Lost" <%= type === 'Lost' ? 'selected' : '' %>>Lost</option>
+                  <option value="Found" <%= type === 'Found' ? 'selected' : '' %>>Found</option>
+                </select>
+              </div>
+
+              <!-- Category Filter -->
+              <div class="col-12">
+                <label for="category" class="form-label fw-semibold">Category</label>
+                <select name="category" id="category" class="form-select form-select-sm rounded-pill border-light-subtle">
+                  <option value="">All Categories</option>
+                  <option value="Phone" <%= category === 'Phone' ? 'selected' : '' %>>Phone</option>
+                  <option value="Wallet" <%= category === 'Wallet' ? 'selected' : '' %>>Wallet</option>
+                  <option value="Keys" <%= category === 'Keys' ? 'selected' : '' %>>Keys</option>
+                  <option value="ID" <%= category === 'ID' ? 'selected' : '' %>>ID</option>
+                  <option value="Bag" <%= category === 'Bag' ? 'selected' : '' %>>Bag</option>
+                  <option value="Jewelry" <%= category === 'Jewelry' ? 'selected' : '' %>>Jewelry</option>
+                  <option value="Clothing" <%= category === 'Clothing' ? 'selected' : '' %>>Clothing</option>
+                  <option value="Other" <%= category === 'Other' ? 'selected' : '' %>>Other</option>
+                </select>
+              </div>
+
+              <!-- Date Filter -->
+              <div class="col-12">
+                <label for="date" class="form-label fw-semibold">Date</label>
+                <input type="date" name="date" id="date" class="form-control form-control-sm rounded-pill border-light-subtle" value="<%= date || '' %>">
+              </div>
+
+              <!-- Location Filter - Country -->
+              <div class="col-12">
+                <label for="country" class="form-label fw-semibold">Country</label>
+                <div class="position-relative">
+                  <select name="country" id="country" class="form-select form-select-sm rounded-pill border-light-subtle">
+                    <option value="">All Countries</option>
+                    <!-- Will be populated with JavaScript -->
+                  </select>
+                  <div class="position-absolute top-0 end-0 px-3 py-1" id="country-loading" style="display: none;">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Location Filter - State -->
+              <div class="col-12">
+                <label for="state" class="form-label fw-semibold">State/Province</label>
+                <div class="position-relative">
+                  <select name="state" id="state" class="form-select form-select-sm rounded-pill border-light-subtle">
+                    <option value="">All States</option>
+                    <!-- Will be populated with JavaScript -->
+                  </select>
+                  <div class="position-absolute top-0 end-0 px-3 py-1" id="state-loading" style="display: none;">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Location Filter - City -->
+              <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                  <label for="city" class="form-label fw-semibold">City</label>
+                  <button type="button" class="btn btn-sm btn-link text-decoration-none p-0" id="toggleCityInput" title="Enter city manually">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                </div>
+                <div class="position-relative">
+                  <select name="city" id="city" class="form-select form-select-sm rounded-pill border-light-subtle">
+                    <option value="">All Cities</option>
+                    <!-- Will be populated with JavaScript -->
+                  </select>
+                  <div class="position-absolute top-0 end-0 px-3 py-1" id="city-loading" style="display: none;">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+                <div id="citySearchContainer" class="mt-2" style="display: none;">
+                  <div class="input-group input-group-sm">
+                    <input type="text" class="form-control rounded-start-pill border-light-subtle" id="citySearch" placeholder="Type city name...">
+                    <button class="btn btn-outline-primary rounded-end-pill" type="button" id="saveCitySearch">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  </div>
+                  <small class="form-text text-muted">Can't find your city? Type it here</small>
+                </div>
+              </div>
+
+              <!-- Keyword Search -->
+              <div class="col-12">
+                <label for="keyword" class="form-label fw-semibold">Search Keywords</label>
+                <div class="input-group input-group-sm">
+                  <span class="input-group-text bg-white border-light-subtle rounded-start-pill">
+                    <i class="fas fa-search text-muted"></i>
+                  </span>
+                  <input type="text" name="keyword" id="keyword" class="form-control border-start-0 border-light-subtle" placeholder="Search items..." value="<%= keyword || '' %>">
+                </div>
+              </div>
+
+              <!-- Search Buttons -->
+              <div class="col-12 d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-sm rounded-pill">
+                  <i class="fas fa-search me-2"></i> Apply Filters
+                </button>
+                <button type="button" id="clear-filters" class="btn btn-outline-secondary btn-sm rounded-pill">
+                  <i class="fas fa-eraser me-2"></i> Clear Filters
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items Display -->
+    <div class="col-lg-9">
+      <% if (items && items.length > 0) { %>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <% items.forEach(item => { %>
+            <div class="col">
+              <div class="card h-100 shadow-sm rounded-3 border-0 overflow-hidden hover-shadow">
+                <div class="position-absolute top-0 end-0 p-2 z-1">
+                  <span class="badge rounded-pill <%= item.type === 'Lost' ? 'bg-danger' : 'bg-success' %> px-3 py-2 fw-semibold">
+                    <%= item.type %>
+                  </span>
+                </div>
+                
+                <% if (item.image1) { %>
+                  <div class="card-img-container position-relative" style="height: 200px; overflow: hidden;">
+                    <img src="<%= item.image1 %>" class="card-img-top" alt="<%= item.title %>" style="object-fit: cover; height: 100%; width: 100%; transition: transform 0.3s;">
+                  </div>
+                <% } else { %>
+                  <div class="card-img-top bg-light d-flex justify-content-center align-items-center" style="height: 200px;">
+                    <i class="fas fa-image text-muted fa-4x"></i>
+                  </div>
+                <% } %>
+                
+                <div class="card-body">
+                  <h5 class="card-title fw-bold mb-2 text-truncate"><%= item.title || 'Untitled Item' %></h5>
+                  <p class="card-text text-muted mb-2 small">
+                    <i class="fas fa-tag me-1"></i> <%= item.category %>
+                  </p>
+                  <p class="card-text text-muted mb-2 small">
+                    <i class="fas fa-map-marker-alt me-1"></i> 
+                    <% if (item.city && item.state) { %>
+                      <%= item.city %>, <%= item.state %>
+                    <% } else { %>
+                      <%= item.location || 'Location not specified' %>
+                    <% } %>
+                  </p>
+                  <p class="card-text text-muted mb-3 small">
+                    <i class="far fa-calendar-alt me-1"></i> <%= item.date ? new Date(item.date).toLocaleDateString() : 'Date not specified' %>
+                  </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0">
+                  <div class="d-grid">
+                    <a href="/items/<%= item.id %>" class="btn btn-outline-primary rounded-pill">View Details</a>
+                  </div>
+                  <p class="card-text mt-2 text-center">
+                    <small class="text-muted">
+                      <i class="far fa-clock me-1"></i>
+                      <% if (item.created_at && typeof moment !== 'undefined') { %>
+                        <%= moment(item.created_at).fromNow() %>
+                      <% } else if (item.created_at) { %>
+                        <%= new Date(item.created_at).toLocaleDateString() %>
+                      <% } else { %>
+                        recently
+                      <% } %>
+                    </small>
+                  </p>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div class="card shadow-sm rounded-3 border-0">
+          <div class="card-body text-center p-5">
+            <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+            <h4 class="fw-bold mb-3">No items found</h4>
+            <p class="mb-4 text-muted">
+              <% if (Object.keys(locals).some(key => ['type', 'category', 'country', 'state', 'city', 'date', 'keyword'].includes(key) && locals[key])) { %>
+                Try adjusting your filters or 
+              <% } else { %>
+                Be the first to 
+              <% } %>
+              <a href="/items/new" class="text-decoration-none">post a new item</a>.
+            </p>
+            <a href="/items/seed-test-item" class="btn btn-outline-secondary rounded-pill btn-sm">
+              <i class="fas fa-magic me-2"></i> Add Sample Items
+            </a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Custom fonts */
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+  
+  /* Hover effects for cards */
+  .hover-shadow {
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+  }
+  
+  .hover-shadow:hover .card-img-top {
+    transform: scale(1.05);
+  }
+  
+  /* Loading spinner */
+  .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+  
+  /* Form styling */
+  .form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Filter form elements
+    const filterForm = document.getElementById('filter-form');
+    const countrySelect = document.getElementById('country');
+    const stateSelect = document.getElementById('state');
+    const citySelect = document.getElementById('city');
+    const clearFiltersBtn = document.getElementById('clear-filters');
+    
+    // City search elements
+    const toggleCityInputBtn = document.getElementById('toggleCityInput');
+    const citySearchContainer = document.getElementById('citySearchContainer');
+    const citySearchInput = document.getElementById('citySearch');
+    const saveCitySearchBtn = document.getElementById('saveCitySearch');
+    
+    // Loading indicators
+    const countryLoading = document.getElementById('country-loading');
+    const stateLoading = document.getElementById('state-loading');
+    const cityLoading = document.getElementById('city-loading');
+    
+    // Initialize current filter values
+    const currentCountry = '<%= country || "" %>';
+    const currentState = '<%= state || "" %>';
+    const currentCity = '<%= city || "" %>';
+    
+    // Track if we're using custom city input
+    let isUsingCustomCity = false;
+    
+    // Live update functionality - auto-submit on change
+    const autoSubmitElements = [
+      document.getElementById('type'),
+      document.getElementById('category'),
+      document.getElementById('date')
+    ];
+    
+    autoSubmitElements.forEach(element => {
+      if (element) {
+        element.addEventListener('change', function() {
+          // Add loading indicator
+          const loadingIndicator = document.createElement('div');
+          loadingIndicator.className = 'position-fixed top-0 start-50 translate-middle-x mt-3 bg-primary text-white px-4 py-2 rounded shadow';
+          loadingIndicator.innerHTML = '<i class="fas fa-sync fa-spin me-2"></i> Updating results...';
+          loadingIndicator.style.zIndex = '1050';
+          document.body.appendChild(loadingIndicator);
+          
+          // Submit the form with a small delay to show the loading indicator
+          setTimeout(() => {
+            filterForm.submit();
+          }, 300);
+        });
+      }
+    });
+    
+    // Toggle between dropdown and search input for city
+    toggleCityInputBtn.addEventListener('click', function() {
+      isUsingCustomCity = !isUsingCustomCity;
+      citySearchContainer.style.display = isUsingCustomCity ? 'block' : 'none';
+      
+      if (isUsingCustomCity) {
+        // Focus the search input when shown
+        citySearchInput.focus();
+        if (currentCity) citySearchInput.value = currentCity;
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-list"></i>'; // Change icon to list
+        toggleCityInputBtn.title = "Switch to dropdown selection";
+      } else {
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>'; // Change icon back to pencil
+        toggleCityInputBtn.title = "Enter city manually";
+      }
+    });
+    
+    // Save the custom city input
+    saveCitySearchBtn.addEventListener('click', function() {
+      const cityName = citySearchInput.value.trim();
+      if (cityName) {
+        // Clear existing options and add the custom city
+        citySelect.innerHTML = '';
+        
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "All Cities";
+        citySelect.appendChild(defaultOption);
+        
+        const customOption = document.createElement('option');
+        customOption.value = cityName;
+        customOption.textContent = cityName;
+        customOption.selected = true;
+        citySelect.appendChild(customOption);
+        
+        // Hide the search container after saving
+        citySearchContainer.style.display = 'none';
+        isUsingCustomCity = false;
+        toggleCityInputBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+        
+        // Enable the select and make it show the selected value
+        citySelect.disabled = false;
+        
+        // Auto-submit the form to apply the filter
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.className = 'position-fixed top-0 start-50 translate-middle-x mt-3 bg-primary text-white px-4 py-2 rounded shadow';
+        loadingIndicator.innerHTML = '<i class="fas fa-sync fa-spin me-2"></i> Updating results...';
+        loadingIndicator.style.zIndex = '1050';
+        document.body.appendChild(loadingIndicator);
+        
+        setTimeout(() => {
+          filterForm.submit();
+        }, 300);
+      }
+    });
+    
+    // Also save city on enter key
+    citySearchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent form submission
+        saveCitySearchBtn.click();
+      }
+    });
+    
+    // Enhanced loading indicators
+    function showLoading(element) {
+      if (element === countrySelect) countryLoading.style.display = 'block';
+      if (element === stateSelect) stateLoading.style.display = 'block';
+      if (element === citySelect) cityLoading.style.display = 'block';
+      element.disabled = true;
+    }
+    
+    function hideLoading(element) {
+      if (element === countrySelect) countryLoading.style.display = 'none';
+      if (element === stateSelect) stateLoading.style.display = 'none';
+      if (element === citySelect) cityLoading.style.display = 'none';
+      element.disabled = false;
+    }
+    
+    function showError(selectElement, message = 'Error loading data') {
+      let currentOptions = selectElement.innerHTML;
+      selectElement.innerHTML = `<option value="" selected>${message}</option>` + currentOptions;
+      hideLoading(selectElement);
+    }
+    
+    // Fetch countries
+    async function fetchCountries() {
+      showLoading(countrySelect);
+      
+      try {
+        const response = await fetch('/api/countries');
+        if (!response.ok) throw new Error('Failed to fetch countries');
+        
+        const countries = await response.json();
+        
+        countrySelect.innerHTML = '<option value="">All Countries</option>';
+        
+        // Track if we found the current country
+        let foundCurrentCountry = false;
+        
+        countries.forEach(country => {
+          const option = document.createElement('option');
+          option.value = country.name;
+          option.dataset.code = country.code;
+          option.textContent = country.name;
+          
+          // Select current country if it matches
+          if (country.name === currentCountry) {
+            option.selected = true;
+            foundCurrentCountry = true;
+          }
+          
+          countrySelect.appendChild(option);
+        });
+        
+        hideLoading(countrySelect);
+        
+        // If we found the current country, load its states
+        if (foundCurrentCountry && currentCountry) {
+          const selectedCountryOption = countrySelect.options[countrySelect.selectedIndex];
+          fetchStates(selectedCountryOption.dataset.code, currentCountry);
+        }
+      } catch (error) {
+        console.error('Error loading countries:', error);
+        showError(countrySelect, 'Error loading countries');
+      }
+    }
+    
+    // Fetch states for a country
+    async function fetchStates(countryCode, countryName) {
+      showLoading(stateSelect);
+      
+      try {
+        const response = await fetch(`/api/states/${countryCode}`);
+        if (!response.ok) throw new Error('Failed to fetch states');
+        
+        const states = await response.json();
+        
+        stateSelect.innerHTML = '<option value="">All States</option>';
+        
+        // Track if we found the current state
+        let foundCurrentState = false;
+        
+        states.forEach(state => {
+          const option = document.createElement('option');
+          option.value = state.name;
+          option.dataset.code = state.code;
+          option.textContent = state.name;
+          
+          // Select current state if it matches
+          if (state.name === currentState) {
+            option.selected = true;
+            foundCurrentState = true;
+          }
+          
+          stateSelect.appendChild(option);
+        });
+        
+        hideLoading(stateSelect);
+        
+        if (states.length === 0) {
+          stateSelect.innerHTML = '<option value="">No states available</option>';
+        }
+        
+        // If we found the current state, load its cities
+        if (foundCurrentState && currentState) {
+          fetchCities(countryCode, stateSelect.options[stateSelect.selectedIndex].dataset.code, countryName, currentState);
+        }
+      } catch (error) {
+        console.error(`Error loading states for ${countryCode}:`, error);
+        showError(stateSelect, 'Error loading states');
+      }
+    }
+    
+    // Fetch cities for a state
+    async function fetchCities(countryCode, regionCode, countryName, stateName) {
+      showLoading(citySelect);
+      
+      try {
+        const response = await fetch(`/api/cities/${countryCode}/${regionCode}`);
+        if (!response.ok) throw new Error('Failed to fetch cities');
+        
+        const cities = await response.json();
+        
+        citySelect.innerHTML = '<option value="">All Cities</option>';
+        
+        // Track if we found the current city
+        let foundCurrentCity = false;
+        
+        cities.forEach(city => {
+          const option = document.createElement('option');
+          option.value = city.name;
+          option.dataset.code = city.code;
+          option.textContent = city.name;
+          
+          // Select current city if it matches
+          if (city.name === currentCity) {
+            option.selected = true;
+            foundCurrentCity = true;
+          }
+          
+          citySelect.appendChild(option);
+        });
+        
+        // If current city is not in the list but we have a value, add it
+        if (!foundCurrentCity && currentCity) {
+          const customOption = document.createElement('option');
+          customOption.value = currentCity;
+          customOption.textContent = currentCity;
+          customOption.selected = true;
+          citySelect.appendChild(customOption);
+        }
+        
+        hideLoading(citySelect);
+        
+      } catch (error) {
+        console.error(`Error loading cities for ${countryCode}/${regionCode}:`, error);
+        showError(citySelect, 'Error loading cities');
+        
+        // If we have a current city, add it despite the error
+        if (currentCity) {
+          const customOption = document.createElement('option');
+          customOption.value = currentCity;
+          customOption.textContent = currentCity;
+          customOption.selected = true;
+          citySelect.appendChild(customOption);
+        }
+      }
+    }
+    
+    // Clear filters button
+    clearFiltersBtn.addEventListener('click', function() {
+      const inputs = filterForm.querySelectorAll('input, select');
+      inputs.forEach(input => {
+        input.value = '';
+      });
+      
+      // Show loading indicator
+      const loadingIndicator = document.createElement('div');
+      loadingIndicator.className = 'position-fixed top-0 start-50 translate-middle-x mt-3 bg-primary text-white px-4 py-2 rounded shadow';
+      loadingIndicator.innerHTML = '<i class="fas fa-sync fa-spin me-2"></i> Clearing filters...';
+      loadingIndicator.style.zIndex = '1050';
+      document.body.appendChild(loadingIndicator);
+      
+      setTimeout(() => {
+        filterForm.submit();
+      }, 300);
+    });
+    
+    // Event listeners for cascading dropdowns
+    countrySelect.addEventListener('change', function() {
+      const selectedOption = this.options[this.selectedIndex];
+      
+      if (this.value) {
+        // Fetch states for the selected country
+        fetchStates(selectedOption.dataset.code, selectedOption.value);
+        
+        // Auto-submit after a short delay to get filtered results
+        setTimeout(() => {
+          filterForm.submit();
+        }, 500);
+      } else {
+        // Reset state and city dropdowns
+        stateSelect.innerHTML = '<option value="">All States</option>';
+        citySelect.innerHTML = '<option value="">All Cities</option>';
+        
+        // Auto-submit to remove the country filter
+        setTimeout(() => {
+          filterForm.submit();
+        }, 300);
+      }
+    });
+    
+    stateSelect.addEventListener('change', function() {
+      const countryOption = countrySelect.options[countrySelect.selectedIndex];
+      const stateOption = this.options[this.selectedIndex];
+      
+      if (this.value && countryOption.value) {
+        // Fetch cities for the selected state
+        fetchCities(countryOption.dataset.code, stateOption.dataset.code, countryOption.value, stateOption.value);
+      } else {
+        // Reset city dropdown
+        citySelect.innerHTML = '<option value="">All Cities</option>';
+      }
+      
+      // Auto-submit after a short delay to get filtered results
+      setTimeout(() => {
+        filterForm.submit();
+      }, 500);
+    });
+    
+    citySelect.addEventListener('change', function() {
+      if (this.value || this.value === '') {
+        // Auto-submit to apply the city filter
+        setTimeout(() => {
+          filterForm.submit();
+        }, 300);
+      }
+    });
+    
+    // Initialize the location filters
+    fetchCountries();
+    
+    // Make the toggle city input button visible
+    toggleCityInputBtn.style.display = 'block';
+  });
+</script> 

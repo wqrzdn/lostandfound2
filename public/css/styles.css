@@ -1,0 +1,177 @@
+/* Global Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Card Hover Effects */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Category Cards */
+.category-card {
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-5px);
+}
+
+/* Form Styling */
+.form-control:focus, .form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button Hover Effects */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+  transform: translateY(-2px);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #bb2d3b;
+  border-color: #b02a37;
+  transform: translateY(-2px);
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.btn-success:hover {
+  background-color: #157347;
+  border-color: #146c43;
+  transform: translateY(-2px);
+}
+
+/* Image Styling */
+.card-img-top {
+  transition: opacity 0.3s ease;
+}
+
+.card-img-top:hover {
+  opacity: 0.9;
+}
+
+/* Badge Styling */
+.badge {
+  font-weight: 500;
+  padding: 0.5em 0.8em;
+}
+
+/* Nav Link Animation */
+.nav-link {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #0d6efd;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Custom Footer */
+footer {
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Item Details List */
+.list-group-item i {
+  width: 20px;
+  text-align: center;
+}
+
+/* Table Responsive Fixes */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Match Card Highlighting */
+.match-highlight {
+  border: 2px solid #ffc107;
+}
+
+/* Admin Dashboard */
+.admin-stats-card {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+/* Pagination Styling */
+.pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.pagination .page-link {
+  color: #0d6efd;
+}
+
+.pagination .page-link:hover {
+  color: #0a58ca;
+  background-color: #e9ecef;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.2rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .display-4 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Dark Mode Toggle (for future implementation) */
+.dark-mode {
+  background-color: #222;
+  color: #f8f9fa;
+}
+
+.dark-mode .card {
+  background-color: #333;
+  color: #f8f9fa;
+} 

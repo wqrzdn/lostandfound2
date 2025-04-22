@@ -1,0 +1,63 @@
+{
+  "India": {
+    "Andhra Pradesh": {
+      "Vijayawada": [],
+      "Guntur": [],
+      "Visakhapatnam": ["Gajuwaka", "MVP Colony", "Seethammadhara"]
+    },
+    "Telangana": {
+      "Hyderabad": ["Madhapur", "Gachibowli", "Begumpet"]
+    }
+  },
+  "USA": {
+    "California": {
+      "Los Angeles": ["Hollywood", "Downtown"],
+      "San Francisco": []
+    },
+    "New York": {
+      "New York City": ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island"],
+      "Buffalo": []
+    },
+    "Texas": {
+      "Austin": [],
+      "Dallas": [],
+      "Houston": ["Downtown", "Midtown", "Medical Center"]
+    }
+  },
+  "UK": {
+    "England": {
+      "London": ["Westminster", "Camden", "Kensington", "Hammersmith"],
+      "Manchester": [],
+      "Birmingham": []
+    },
+    "Scotland": {
+      "Edinburgh": [],
+      "Glasgow": []
+    }
+  },
+  "Canada": {
+    "Ontario": {
+      "Toronto": ["Downtown", "North York", "Scarborough"],
+      "Ottawa": []
+    },
+    "British Columbia": {
+      "Vancouver": [],
+      "Victoria": []
+    },
+    "Quebec": {
+      "Montreal": [],
+      "Quebec City": []
+    }
+  },
+  "Australia": {
+    "New South Wales": {
+      "Sydney": ["CBD", "Bondi", "Parramatta"]
+    },
+    "Victoria": {
+      "Melbourne": []
+    },
+    "Queensland": {
+      "Brisbane": []
+    }
+  }
+} 

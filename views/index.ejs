@@ -1,0 +1,124 @@
+<!-- Hero Section -->
+<div class="bg-primary text-white p-5 rounded-3 mb-5">
+  <div class="container py-5">
+    <h1 class="display-4 fw-bold">Lost Something? Found Something?</h1>
+    <p class="col-md-8 fs-4">A simple way to reconnect people with their lost items and help good Samaritans return what they've found.</p>
+    <div class="mt-4">
+      <a href="/items/new?type=Lost" class="btn btn-danger btn-lg me-3">
+        <i class="fas fa-search me-2"></i>I Lost Something
+      </a>
+      <a href="/items/new?type=Found" class="btn btn-success btn-lg">
+        <i class="fas fa-hands-helping me-2"></i>I Found Something
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Action Cards -->
+<div class="row mb-4 g-4">
+  <div class="col-md-4">
+    <div class="card h-100 border-primary">
+      <div class="card-body text-center">
+        <i class="fas fa-list fa-3x text-primary mb-3"></i>
+        <h5 class="card-title">Browse Lost & Found</h5>
+        <p class="card-text">View all posted items in our database. Maybe what you're looking for is already here!</p>
+        <a href="/items" class="btn btn-outline-primary">Browse All Items</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-danger">
+      <div class="card-body text-center">
+        <i class="fas fa-search fa-3x text-danger mb-3"></i>
+        <h5 class="card-title">Lost Items</h5>
+        <p class="card-text">View items that people have reported as lost. Maybe you've found one of these!</p>
+        <a href="/items?type=Lost" class="btn btn-outline-danger">View Lost Items</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card h-100 border-success">
+      <div class="card-body text-center">
+        <i class="fas fa-hand-holding-heart fa-3x text-success mb-3"></i>
+        <h5 class="card-title">Found Items</h5>
+        <p class="card-text">Check out items that have been found by others. Yours might be waiting for you!</p>
+        <a href="/items?type=Found" class="btn btn-outline-success">View Found Items</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popular Categories -->
+<div class="my-5">
+  <h2 class="text-center mb-4">Popular Categories</h2>
+  <div class="row g-4">
+    <div class="col-6 col-md-3">
+      <a href="/items?category=Phone" class="text-decoration-none">
+        <div class="card category-card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-mobile-alt fa-3x mb-3 text-muted"></i>
+            <h5 class="card-title">Phones</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/items?category=Wallet" class="text-decoration-none">
+        <div class="card category-card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-wallet fa-3x mb-3 text-muted"></i>
+            <h5 class="card-title">Wallets</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/items?category=Keys" class="text-decoration-none">
+        <div class="card category-card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-key fa-3x mb-3 text-muted"></i>
+            <h5 class="card-title">Keys</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-md-3">
+      <a href="/items?category=ID" class="text-decoration-none">
+        <div class="card category-card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-id-card fa-3x mb-3 text-muted"></i>
+            <h5 class="card-title">ID Cards</h5>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- How It Works -->
+<div class="bg-light p-5 rounded-3 my-5">
+  <h2 class="text-center mb-4">How It Works</h2>
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="bg-primary text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 50px; height: 50px;">1</div>
+        <h5>Post Your Item</h5>
+        <p>Lost something or found an item? Create a listing with details and photos.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="bg-primary text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 50px; height: 50px;">2</div>
+        <h5>Connect</h5>
+        <p>Browse listings or check for matches to your posted item.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="text-center">
+        <div class="bg-primary text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 50px; height: 50px;">3</div>
+        <h5>Reunite</h5>
+        <p>Get in touch with the poster and arrange to return or collect the item.</p>
+      </div>
+    </div>
+  </div>
+</div> 
