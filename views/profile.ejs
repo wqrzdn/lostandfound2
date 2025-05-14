@@ -1,0 +1,105 @@
+<div class="container py-5">
+  <!-- Flash messages -->
+  <% if (locals.success_msg) { %>
+    <div class="alert alert-success alert-dismissible fade show">
+      <%= success_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <% if (locals.error_msg) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
+      <%= error_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <% if (locals.info_msg) { %>
+    <div class="alert alert-info alert-dismissible fade show">
+      <%= info_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <div class="row">
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <% if (user.profileImage) { %>
+            <img src="<%= user.profileImage %>" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 150px; height: 150px; object-fit: cover;">
+          <% } else { %>
+            <img src="https://via.placeholder.com/150" alt="Default Profile" class="rounded-circle img-fluid" style="width: 150px;">
+          <% } %>
+          <h5 class="my-3"><%= user.name %></h5>
+          <p class="text-muted mb-1"><%= user.email %></p>
+          <p class="text-muted mb-4">Member since <%= new Date(user.createdAt).toLocaleDateString() %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Full Name</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-0"><%= user.name %></p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Email</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-0"><%= user.email %></p>
+            </div>
+          </div>
+          <hr>
+          <% if (user.phone) { %>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Phone</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-0"><%= user.phone %></p>
+            </div>
+          </div>
+          <hr>
+          <% } %>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Items Posted</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-0"><%= user.items ? user.items.length : 0 %></p>
+            </div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-3">
+              <p class="mb-0">Last Login</p>
+            </div>
+            <div class="col-sm-9">
+              <p class="text-muted mb-0"><%= user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'N/A' %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Quick Actions</h5>
+              <div class="d-flex justify-content-start mt-3">
+                <a href="/items/my-items" class="btn btn-primary me-2">My Items</a>
+                <a href="/items/new" class="btn btn-success me-2">Post New Item</a>
+                <a href="/dashboard" class="btn btn-info">Dashboard</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

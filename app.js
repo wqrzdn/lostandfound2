@@ -417,6 +417,20 @@ app.use('/', requireAuth);
 // Items routes
 app.use('/items', itemsRouter(upload));
 
+// Profile route
+app.get('/profile', requireAuth, (req, res) => {
+  try {
+    // Ensure user is authenticated (requireAuth middleware already does this)
+    res.render('profile', { user: req.user });
+  } catch (error) {
+    console.error('Profile route error:', error);
+    res.status(500).render('error', {
+      message: 'Error loading profile',
+      error: error
+    });
+  }
+});
+
 // Admin routes - require admin role
 app.use('/admin', requireAdmin, adminRouter);
 
