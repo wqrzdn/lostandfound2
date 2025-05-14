@@ -1,0 +1,110 @@
+<%- include('../partials/admin_header') %>
+
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="fw-bold">Manage All Items</h1>
+    <div>
+      <a href="/admin/dashboard" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <% if (locals.success_msg && success_msg.length > 0) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= success_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  
+  <% if (locals.error_msg && error_msg.length > 0) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <%= error_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <div class="card shadow-sm border-0 rounded-3 mb-4">
+    <div class="card-header bg-white py-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">All Items (<%= items.length %>)</h5>
+        <div class="d-flex gap-2">
+          <a href="/items/new" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Add New Item
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Type</th>
+              <th scope="col">Title</th>
+              <th scope="col">Category</th>
+              <th scope="col">Location</th>
+              <th scope="col">Posted By</th>
+              <th scope="col">Date</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (items && items.length > 0) { %>
+              <% items.forEach(item => { %>
+                <tr>
+                  <td><small class="text-muted"><%= item._id.toString().substring(0, 8) %>...</small></td>
+                  <td>
+                    <span class="badge <%= item.type.toLowerCase() === 'lost' ? 'bg-danger' : 'bg-success' %> rounded-pill px-3 py-2">
+                      <%= item.type %>
+                    </span>
+                  </td>
+                  <td><a href="/items/<%= item._id %>" class="text-decoration-none"><%= item.title %></a></td>
+                  <td><%= item.category %></td>
+                  <td><%= item.location %></td>
+                  <td>
+                    <% if (item.user) { %>
+                      <small>
+                        <a href="/admin/users/<%= item.user._id %>" class="text-decoration-none">
+                          <%= item.user.email %>
+                        </a>
+                      </small>
+                    <% } else { %>
+                      <small class="text-muted">No user</small>
+                    <% } %>
+                  </td>
+                  <td><small class="text-muted"><%= moment(item.createdAt).format('MMM D, YYYY') %></small></td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      <a href="/admin/items/<%= item._id %>/edit" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <form action="/items/<%= item._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this item? This action cannot be undone.');">
+                        <input type="hidden" name="adminDelete" value="true">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="8" class="text-center py-4">
+                  <div class="text-muted">
+                    <i class="fas fa-box-open fa-2x mb-3"></i>
+                    <p>No items found in the database.</p>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/admin_footer') %>

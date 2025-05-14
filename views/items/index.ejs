@@ -3,9 +3,9 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="fw-bold">
-        <% if (type === 'Lost') { %>
+        <% if (locals.type && type === 'Lost') { %>
           <i class="fas fa-search text-danger me-2"></i> Lost Items
-        <% } else if (type === 'Found') { %>
+        <% } else if (locals.type && type === 'Found') { %>
           <i class="fas fa-hand-holding-heart text-success me-2"></i> Found Items
         <% } else { %>
           <i class="fas fa-list text-primary me-2"></i> Browse Items

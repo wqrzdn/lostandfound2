@@ -89,6 +89,28 @@
       left: 0;
       background: white;
     }
+
+    /* Authentication buttons styling */
+    .auth-buttons .nav-link {
+      margin: 0 5px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .auth-buttons .login-btn {
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .auth-buttons .signup-btn {
+      background-color: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .auth-buttons .login-btn:hover, 
+    .auth-buttons .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
@@ -104,6 +126,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
+          <% if (typeof user !== 'undefined' && user) { %>
+          <!-- Navigation items only shown to logged-in users -->
           <li class="nav-item">
             <a class="nav-link" href="/"><i class="fas fa-home me-1"></i> Home</a>
           </li>
@@ -130,9 +154,32 @@
               <li><a class="dropdown-item" href="/items?category=Bag"><i class="fas fa-briefcase me-2"></i> Bags</a></li>
             </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/items/admin/dashboard"><i class="fas fa-user-shield me-1"></i> Admin</a>
-          </li>
+          <% } %>
+
+          <div class="auth-buttons d-flex">
+            <% if (typeof user !== 'undefined' && user) { %>
+              <% if (user.role !== 'admin') { %> <!-- Only show for regular users, not admins -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-user-circle me-1"></i> <%= user.name %>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                  <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> My Profile</a></li>
+                  <li><a class="dropdown-item" href="/items/my-items"><i class="fas fa-list-alt me-2"></i> My Items</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                </ul>
+              </li>
+              <% } %>
+            <% } else { %>
+              <li class="nav-item">
+                <a class="nav-link login-btn px-3 py-1" href="/auth/login"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link signup-btn px-3 py-1" href="/auth/register"><i class="fas fa-user-plus me-1"></i> Sign Up</a>
+              </li>
+            <% } %>
+          </div>
         </ul>
       </div>
     </div>
@@ -166,4 +213,4 @@
   <!-- Custom JavaScript -->
   <script src="/js/main.js"></script>
 </body>
-</html> 
+</html>

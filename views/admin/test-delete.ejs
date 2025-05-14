@@ -1,0 +1,54 @@
+<%- include('../partials/admin_header') %>
+
+<div class="container py-4">
+  <h1 class="mb-4">Admin Delete Test</h1>
+  
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">User Information</h3>
+    </div>
+    <div class="card-body">
+      <% if (req.user) { %>
+        <p><strong>User Email:</strong> <%= req.user.email %></p>
+        <p><strong>User Role:</strong> <%= req.user.role %></p>
+        <p><strong>User ID:</strong> <%= req.user._id %></p>
+      <% } else { %>
+        <p class="text-danger">No user detected in request!</p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">Test Item Deletion</h3>
+    </div>
+    <div class="card-body">
+      <p class="mb-3">This form will attempt to delete an item with direct debugging information.</p>
+      
+      <form action="/admin/test-delete" method="POST" class="mb-4">
+        <div class="mb-3">
+          <label for="itemId" class="form-label">Item ID to Delete</label>
+          <input type="text" class="form-control" id="itemId" name="itemId" required>
+        </div>
+        <button type="submit" class="btn btn-danger">Test Delete Item</button>
+      </form>
+    </div>
+  </div>
+
+  <% if (locals.testResult) { %>
+    <div class="card mb-4">
+      <div class="card-header bg-<%= testResult.success ? 'success' : 'danger' %> text-white">
+        <h3 class="mb-0">Test Result</h3>
+      </div>
+      <div class="card-body">
+        <pre><%= JSON.stringify(testResult, null, 2) %></pre>
+      </div>
+    </div>
+  <% } %>
+
+  <a href="/admin/dashboard" class="btn btn-outline-primary">
+    <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+  </a>
+</div>
+
+<%- include('../partials/admin_footer') %>

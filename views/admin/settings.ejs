@@ -1,0 +1,122 @@
+<%- include('../partials/admin_header') %>
+<!-- Admin Settings Page -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><i class="fas fa-cog text-primary me-2"></i> System Settings</h1>
+  <div>
+    <a href="/admin/dashboard" class="btn btn-outline-primary me-2">
+      <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+    </a>
+    <a href="/" class="btn btn-outline-secondary">
+      <i class="fas fa-home me-1"></i> Home
+    </a>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header bg-light">
+    <h4 class="mb-0"><i class="fas fa-sliders-h me-2"></i> Application Settings</h4>
+  </div>
+  <div class="card-body">
+    <form action="/admin/settings" method="POST">
+      <!-- System Name -->
+      <div class="mb-3">
+        <label for="systemName" class="form-label">System Name</label>
+        <input type="text" class="form-control" id="systemName" name="systemName" value="Lost and Found">
+        <div class="form-text">The name displayed in various parts of the application.</div>
+      </div>
+      
+      <!-- Item Expiry -->
+      <div class="mb-3">
+        <label for="itemExpiry" class="form-label">Item Expiry (days)</label>
+        <input type="number" class="form-control" id="itemExpiry" name="itemExpiry" value="180">
+        <div class="form-text">Number of days before items are marked as expired.</div>
+      </div>
+      
+      <!-- Email Notification Settings -->
+      <div class="card mt-4 mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Email Notification Settings</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="enableEmails" name="enableEmails" checked>
+            <label class="form-check-label" for="enableEmails">Enable Email Notifications</label>
+          </div>
+          
+          <div class="mb-3">
+            <label for="adminEmail" class="form-label">Admin Email</label>
+            <input type="email" class="form-control" id="adminEmail" name="adminEmail" value="admin@example.com">
+          </div>
+          
+          <div class="mb-3">
+            <label for="fromEmail" class="form-label">From Email</label>
+            <input type="email" class="form-control" id="fromEmail" name="fromEmail" value="noreply@lostandfound.com">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Security Settings -->
+      <div class="card mt-4 mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Security Settings</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="sessionExpiry" class="form-label">Session Expiry (hours)</label>
+            <input type="number" class="form-control" id="sessionExpiry" name="sessionExpiry" value="24">
+          </div>
+          
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="requireEmailVerification" name="requireEmailVerification">
+            <label class="form-check-label" for="requireEmailVerification">Require Email Verification</label>
+          </div>
+          
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="allowGuestSubmissions" name="allowGuestSubmissions">
+            <label class="form-check-label" for="allowGuestSubmissions">Allow Guest Submissions</label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Submit Button -->
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save me-2"></i> Save Settings
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Database Settings -->
+<div class="card mb-4">
+  <div class="card-header bg-light">
+    <h4 class="mb-0"><i class="fas fa-database me-2"></i> Database Management</h4>
+  </div>
+  <div class="card-body">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-broom text-warning me-2"></i> Database Cleanup</h5>
+            <p class="card-text">Remove expired and old items from the database.</p>
+            <a href="/admin/cleanup" class="btn btn-warning">
+              <i class="fas fa-trash-alt me-1"></i> Cleanup Database
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-download text-info me-2"></i> Database Backup</h5>
+            <p class="card-text">Create a backup of your current database.</p>
+            <a href="/admin/backup" class="btn btn-info text-white">
+              <i class="fas fa-save me-1"></i> Backup Database
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

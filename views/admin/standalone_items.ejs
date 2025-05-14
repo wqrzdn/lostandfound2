@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Item Management - Lost and Found</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .admin-sidebar {
+      background-color: #1a2942;
+      min-height: calc(100vh - 56px);
+      color: #fff;
+    }
+    
+    .admin-sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.7);
+      padding: 0.75rem 1rem;
+      border-radius: 0.25rem;
+      margin: 0.25rem 0;
+    }
+    
+    .admin-sidebar .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .admin-sidebar .nav-link.active {
+      background-color: #3b82f6;
+      color: #fff;
+    }
+    
+    .card {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <!-- Admin-Only Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="/admin/dashboard">
+        <i class="fas fa-shield-alt me-2"></i>
+        Admin Dashboard
+      </a>
+      
+      <div class="ms-auto d-flex align-items-center">
+        <a href="/" class="btn btn-outline-light me-2">
+          <i class="fas fa-home me-1"></i> Main Site
+        </a>
+        <a href="/auth/logout" class="btn btn-danger">
+          <i class="fas fa-sign-out-alt me-1"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 admin-sidebar p-3">
+        <h5 class="mb-3 ps-2">Admin Controls</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/dashboard">
+              <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/admin/items">
+              <i class="fas fa-list-alt me-2"></i> Manage Items
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/users">
+              <i class="fas fa-users me-2"></i> Manage Users
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/settings">
+              <i class="fas fa-cog me-2"></i> Settings
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Area -->
+      <div class="col-md-9 col-lg-10 p-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="mb-0"><i class="fas fa-box-open text-primary me-2"></i> Item Management</h1>
+          <div>
+            <a href="/admin/dashboard" class="btn btn-outline-secondary me-2">
+              <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+          </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <% if (locals.success_msg) { %>
+          <div class="alert alert-success alert-dismissible fade show">
+            <%= success_msg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+        <% if (locals.error_msg) { %>
+          <div class="alert alert-danger alert-dismissible fade show">
+            <%= error_msg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+
+        <!-- Items Table -->
+        <div class="card">
+          <div class="card-header bg-light">
+            <div class="row align-items-center">
+              <div class="col">
+                <h4 class="mb-0">All Items (<%= items.length %>)</h4>
+              </div>
+              <div class="col-auto">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="itemSearch" placeholder="Search items...">
+                  <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="mb-3 d-flex">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary active" onclick="filterItems('all')">All Items</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="filterItems('lost')">Lost Items</button>
+                <button type="button" class="btn btn-sm btn-outline-success" onclick="filterItems('found')">Found Items</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Posted By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (items && items.length > 0) { %>
+                    <% items.forEach(item => { %>
+                      <tr class="item-row" data-type="<%= item.type.toLowerCase() %>">
+                        <td><small class="text-muted"><%= item._id.toString().substring(0, 8) %>...</small></td>
+                        <td>
+                          <% if (item.image1) { %>
+                            <img src="<%= item.image1 %>" alt="<%= item.title %>" class="img-thumbnail" style="height: 50px; width: 50px; object-fit: cover;">
+                          <% } else { %>
+                            <i class="fas fa-image text-muted"></i>
+                          <% } %>
+                        </td>
+                        <td><a href="/items/<%= item._id %>" class="text-decoration-none"><%= item.title %></a></td>
+                        <td>
+                          <span class="badge <%= item.type.toLowerCase() === 'lost' ? 'bg-danger' : 'bg-success' %> rounded-pill px-3 py-2">
+                            <%= item.type %>
+                          </span>
+                        </td>
+                        <td><%= item.category %></td>
+                        <td><%= item.location %></td>
+                        <td><small class="text-muted"><%= moment(item.createdAt).format('MMM D, YYYY') %></small></td>
+                        <td>
+                          <% if (item.user) { %>
+                            <small>
+                              <a href="/admin/users/<%= item.user._id %>" class="text-decoration-none">
+                                <%= item.user.email %>
+                              </a>
+                            </small>
+                          <% } else { %>
+                            <small class="text-muted">No user</small>
+                          <% } %>
+                        </td>
+                        <td>
+                          <div class="d-flex gap-1">
+                            <a href="/admin/items/<%= item._id %>/edit" class="btn btn-sm btn-outline-primary">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="/items/<%= item._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this item? This action cannot be undone.');">
+                              <input type="hidden" name="adminDelete" value="true">
+                              <button type="submit" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt"></i>
+                              </button>
+                            </form>
+                          </div>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="9" class="text-center py-4">
+                        <div class="text-muted">
+                          <i class="fas fa-box-open fa-2x mb-3"></i>
+                          <p>No items found in the database.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function filterItems(type) {
+      // Remove active class from all buttons
+      document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Add active class to clicked button
+      document.querySelector(`.btn-group .btn[onclick="filterItems('${type}')"]`).classList.add('active');
+      
+      // Show/hide rows based on type
+      const rows = document.querySelectorAll('.item-row');
+      rows.forEach(row => {
+        if (type === 'all' || row.dataset.type === type) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+    
+    // Search functionality
+    document.getElementById('itemSearch').addEventListener('keyup', function() {
+      const query = this.value.toLowerCase();
+      const rows = document.querySelectorAll('.item-row');
+      
+      rows.forEach(row => {
+        const itemText = row.textContent.toLowerCase();
+        if (itemText.includes(query)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

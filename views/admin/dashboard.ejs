@@ -1,65 +1,250 @@
-<!-- Page Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h1><i class="fas fa-user-shield text-primary me-2"></i> Admin Dashboard</h1>
-  <a href="/" class="btn btn-outline-primary">
-    <i class="fas fa-home me-1"></i> Back to Home
-  </a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Lost and Found</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .admin-sidebar {
+      background-color: #1a2942;
+      min-height: calc(100vh - 56px);
+      color: #fff;
+    }
+    
+    .admin-sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.7);
+      padding: 0.75rem 1rem;
+      border-radius: 0.25rem;
+      margin: 0.25rem 0;
+    }
+    
+    .admin-sidebar .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    
+    .admin-sidebar .nav-link.active {
+      background-color: #3b82f6;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Admin-Only Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center" href="/admin/dashboard">
+        <i class="fas fa-shield-alt me-2"></i>
+        Admin Dashboard
+      </a>
+      
+      <div class="ms-auto d-flex align-items-center">
+        <a href="/" class="btn btn-outline-light me-2">
+          <i class="fas fa-home me-1"></i> Main Site
+        </a>
+        <a href="/auth/logout" class="btn btn-danger">
+          <i class="fas fa-sign-out-alt me-1"></i> Logout
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-3 col-lg-2 admin-sidebar p-3">
+        <h5 class="mb-3 ps-2">Admin Controls</h5>
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="/admin/dashboard">
+              <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/items">
+              <i class="fas fa-list-alt me-2"></i> Manage Items
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/users">
+              <i class="fas fa-users me-2"></i> Manage Users
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/settings">
+              <i class="fas fa-cog me-2"></i> Settings
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Content Area -->
+      <div class="col-md-9 col-lg-10 p-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1><i class="fas fa-user-shield text-primary me-2"></i> Admin Dashboard</h1>
+        </div>
+
+<!-- Admin Action Buttons -->
+<div class="row mb-4">
+  <div class="col-md-4 mb-3">
+    <a href="/admin/items" class="btn btn-primary w-100 py-3">
+      <i class="fas fa-box-open fa-2x mb-2"></i><br>
+      Manage Items
+    </a>
+  </div>
+  <div class="col-md-4 mb-3">
+    <a href="/admin/users" class="btn btn-info text-white w-100 py-3">
+      <i class="fas fa-users fa-2x mb-2"></i><br>
+      Manage Users
+    </a>
+  </div>
+  <div class="col-md-4 mb-3">
+    <a href="/admin/settings" class="btn btn-secondary w-100 py-3">
+      <i class="fas fa-cog fa-2x mb-2"></i><br>
+      System Settings
+    </a>
+  </div>
+</div>
+
+<!-- System Status Card -->
+<div class="card mb-4">
+  <div class="card-header bg-light">
+    <h4 class="mb-0"><i class="fas fa-server me-2"></i> System Status</h4>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="border-bottom pb-2">Database Connection</h5>
+        <div class="d-flex justify-content-between">
+          <span>Status:</span>
+          <span class="badge bg-success">Connected</span>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+          <span>Type:</span>
+          <span>MongoDB</span>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h5 class="border-bottom pb-2">System Information</h5>
+        <div class="d-flex justify-content-between">
+          <span>Environment:</span>
+          <span><%= process.env.NODE_ENV || 'development' %></span>
+        </div>
+        <div class="d-flex justify-content-between mt-2">
+          <span>Server Time:</span>
+          <span><%= new Date().toLocaleString() %></span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Dashboard Cards -->
 <div class="row mb-4 g-4">
-  <div class="col-md-4">
+  <div class="col-md-3">
     <div class="card bg-primary text-white h-100">
       <div class="card-body text-center">
-        <h1 class="display-4"><%= items.length %></h1>
+        <h1 class="display-4"><%= itemStats.total || 0 %></h1>
         <h5>Total Items</h5>
       </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card bg-danger text-white h-100">
-      <div class="card-body text-center">
-        <h1 class="display-4"><%= items.filter(item => item.type === 'Lost').length %></h1>
-        <h5>Lost Items</h5>
+      <div class="card-footer bg-primary-dark text-center">
+        <a href="#items-table" class="text-white text-decoration-none">
+          <i class="fas fa-arrow-right me-1"></i> View Below
+        </a>
       </div>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-3">
+    <div class="card bg-danger text-white h-100">
+      <div class="card-body text-center">
+        <h1 class="display-4"><%= itemStats.lost || 0 %></h1>
+        <h5>Lost Items</h5>
+      </div>
+      <div class="card-footer bg-danger text-center" style="background-color: rgba(0,0,0,0.1);">
+        <button onclick="filterItems('lost')" class="btn btn-link text-white text-decoration-none p-0">
+          <i class="fas fa-arrow-right me-1"></i> Filter Below
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
     <div class="card bg-success text-white h-100">
       <div class="card-body text-center">
-        <h1 class="display-4"><%= items.filter(item => item.type === 'Found').length %></h1>
+        <h1 class="display-4"><%= itemStats.found || 0 %></h1>
         <h5>Found Items</h5>
+      </div>
+      <div class="card-footer bg-success text-center" style="background-color: rgba(0,0,0,0.1);">
+        <button onclick="filterItems('found')" class="btn btn-link text-white text-decoration-none p-0">
+          <i class="fas fa-arrow-right me-1"></i> Filter Below
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card bg-info text-white h-100">
+      <div class="card-body text-center">
+        <h1 class="display-4"><%= userStats.total || 0 %></h1>
+        <h5>Total Users</h5>
+      </div>
+      <div class="card-footer bg-info text-center" style="background-color: rgba(0,0,0,0.1);">
+        <a href="/admin/users" class="text-white text-decoration-none">
+          <i class="fas fa-arrow-right me-1"></i> Manage Users
+        </a>
       </div>
     </div>
   </div>
 </div>
 
 <!-- Items Management Table -->
-<div class="card">
-  <div class="card-header bg-light">
-    <h4 class="mb-0"><i class="fas fa-table me-2"></i> Manage Items</h4>
+<div class="card" id="items-table">
+  <div class="card-header bg-light d-flex justify-content-between align-items-center">
+    <h4 class="mb-0"><i class="fas fa-shield-alt me-2"></i> Admin Item Management (Total: <%= items.length %>)</h4>
+    <a href="/admin/items" class="btn btn-primary">
+      <i class="fas fa-tasks me-1"></i> Full Item Management
+    </a>
   </div>
   <div class="card-body">
+    <div class="mb-3">
+      <p class="mb-0 text-muted"><i class="fas fa-info-circle me-1"></i> This dashboard provides administrative oversight of all items. For detailed management, use the Full Item Management option.</p>
+    </div>
+
     <% if (items && items.length > 0) { %>
       <div class="table-responsive">
         <table class="table table-striped table-hover align-middle">
-          <thead>
+          <thead class="table-dark">
             <tr>
-              <th>ID</th>
-              <th>Image</th>
-              <th>Title</th>
-              <th>Type</th>
-              <th>Category</th>
-              <th>Location</th>
-              <th>Date</th>
-              <th>Posted</th>
-              <th>Actions</th>
+              <th style="width: 5%">ID</th>
+              <th style="width: 8%">Image</th>
+              <th style="width: 15%">Title</th>
+              <th style="width: 8%">Type</th>
+              <th style="width: 10%">Category</th>
+              <th style="width: 8%">Status</th>
+              <th style="width: 10%">Location</th>
+              <th style="width: 10%">Date</th>
+              <th style="width: 10%">Posted</th>
+              <th style="width: 16%">Actions</th>
             </tr>
           </thead>
           <tbody>
             <% items.forEach(item => { %>
               <tr>
-                <td><%= item.id %></td>
+                <td><small class="text-muted"><%= item._id.toString().slice(-6) %></small></td>
                 <td>
                   <% if (item.image1) { %>
                     <img src="<%= item.image1 %>" alt="<%= item.title %>" class="img-thumbnail" style="height: 50px; width: 50px; object-fit: cover;">
@@ -67,26 +252,46 @@
                     <i class="fas fa-image text-muted"></i>
                   <% } %>
                 </td>
-                <td><%= item.title %></td>
+                <td><strong><%= item.title %></strong></td>
                 <td>
-                  <span class="badge <%= item.type === 'Lost' ? 'bg-danger' : 'bg-success' %>">
-                    <%= item.type %>
+                  <span class="badge <%= item.type === 'lost' ? 'bg-danger' : 'bg-success' %>">
+                    <%= item.type === 'lost' ? 'Lost' : 'Found' %>
                   </span>
                 </td>
                 <td><%= item.category %></td>
+                <td>
+                  <% let statusBadgeClass = 'bg-secondary'; %>
+                  <% if (item.status === 'active') { statusBadgeClass = 'bg-info'; } %>
+                  <% if (item.status === 'resolved') { statusBadgeClass = 'bg-success'; } %>
+                  <% if (item.status === 'expired') { statusBadgeClass = 'bg-warning'; } %>
+                  <span class="badge <%= statusBadgeClass %>">
+                    <%= item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Unknown' %>
+                  </span>
+                </td>
                 <td><%= item.location %></td>
-                <td><%= moment(item.date).format('MM/DD/YYYY') %></td>
-                <td><%= moment(item.created_at).format('MM/DD/YYYY') %></td>
+                <td><%= item.date %></td>
+                <td><%= moment(item.createdAt).format('MM/DD/YYYY, h:mm a') %></td>
                 <td>
                   <div class="btn-group btn-group-sm">
-                    <a href="/items/<%= item.id %>" class="btn btn-outline-primary">
+                    <a href="/items/<%= item._id %>" class="btn btn-outline-primary" title="View">
                       <i class="fas fa-eye"></i>
                     </a>
-                    <a href="/items/<%= item.id %>/edit" class="btn btn-outline-secondary">
+                    <a href="/items/<%= item._id %>/edit" class="btn btn-outline-secondary" title="Edit">
                       <i class="fas fa-edit"></i>
                     </a>
-                    <form action="/items/<%= item.id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this item?');">
-                      <button type="submit" class="btn btn-outline-danger">
+                    <div class="btn-group btn-group-sm">
+                      <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        Status
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/items/<%= item._id %>/status/active">Active</a></li>
+                        <li><a class="dropdown-item" href="/admin/items/<%= item._id %>/status/resolved">Resolved</a></li>
+                        <li><a class="dropdown-item" href="/admin/items/<%= item._id %>/status/expired">Expired</a></li>
+                      </ul>
+                    </div>
+                    <form action="/items/<%= item._id %>?_method=DELETE" method="POST" class="d-inline" 
+                          onsubmit="return confirm('Are you sure you want to delete this item? This action cannot be undone.');">
+                      <button type="submit" class="btn btn-outline-danger" title="Delete">
                         <i class="fas fa-trash-alt"></i>
                       </button>
                     </form>
@@ -97,10 +302,107 @@
           </tbody>
         </table>
       </div>
+      
+      <div class="mt-3">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1">Previous</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
     <% } else { %>
       <div class="alert alert-info">
         <i class="fas fa-info-circle me-2"></i> No items have been posted yet.
       </div>
     <% } %>
   </div>
-</div> 
+</div>
+
+<script>
+  // Simple search functionality for items table
+  document.getElementById('itemSearch').addEventListener('keyup', function() {
+    const searchText = this.value.toLowerCase();
+    const table = document.querySelector('table');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+      const title = row.cells[2].textContent.toLowerCase();
+      const category = row.cells[4].textContent.toLowerCase();
+      const location = row.cells[6].textContent.toLowerCase();
+      
+      if (title.includes(searchText) || category.includes(searchText) || location.includes(searchText)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  });
+  
+  // Filter items by type (lost/found)
+  function filterItems(type) {
+    const table = document.querySelector('table');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    // Update active button
+    document.querySelectorAll('.btn-group:first-child .btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`.btn-group:first-child .btn[onclick="filterItems('${type}')"]`).classList.add('active');
+    
+    if (type === 'all') {
+      rows.forEach(row => {
+        row.style.display = '';
+      });
+      return;
+    }
+    
+    rows.forEach(row => {
+      const itemType = row.cells[3].textContent.trim().toLowerCase();
+      if (itemType.includes(type)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+  
+  // Filter items by status
+  function filterItemsByStatus(status) {
+    const table = document.querySelector('table');
+    const rows = table.querySelectorAll('tbody tr');
+    
+    // Update active button
+    document.querySelectorAll('.btn-group:nth-child(2) .btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`.btn-group:nth-child(2) .btn[onclick="filterItemsByStatus('${status}')"]`).classList.add('active');
+    
+    rows.forEach(row => {
+      const itemStatus = row.cells[5].textContent.trim().toLowerCase();
+      if (itemStatus.includes(status.toLowerCase())) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+  
+  // When clicking on a card, scroll to the items table
+  document.addEventListener('DOMContentLoaded', function() {
+    const viewBelowLink = document.querySelector('a[href="#items-table"]');
+    if (viewBelowLink) {
+      viewBelowLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('items-table').scrollIntoView({ behavior: 'smooth' });
+      });
+    }
+  });
+</script> 

@@ -3,14 +3,25 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const multer = require('multer');
 const methodOverride = require('method-override');
-const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const ejsLayouts = require('express-ejs-layouts');
 const fetch = require('node-fetch');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const session = require('express-session');
+
+// Load environment variables
+dotenv.config();
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Database Connection
+const connectDB = require('./config/database');
+
+// Import MongoDB models
+const Item = require('./models/Item'); // Make sure this path is correct
 
 // Location API Configuration
 const COUNTRIES_API_URL = 'https://restcountries.com/v3.1/all?fields=name,cca2';
@@ -28,128 +39,14 @@ const apiCache = {
 
 // Common states/provinces data for fallback
 const commonStatesData = {
+  // Keep your existing commonStatesData object here
   'US': [
-    { name: 'Alabama', code: 'AL' },
-    { name: 'Alaska', code: 'AK' },
-    { name: 'Arizona', code: 'AZ' },
-    { name: 'Arkansas', code: 'AR' },
-    { name: 'California', code: 'CA' },
-    { name: 'Colorado', code: 'CO' },
-    { name: 'Connecticut', code: 'CT' },
-    { name: 'Delaware', code: 'DE' },
-    { name: 'Florida', code: 'FL' },
-    { name: 'Georgia', code: 'GA' },
-    { name: 'Hawaii', code: 'HI' },
-    { name: 'Idaho', code: 'ID' },
-    { name: 'Illinois', code: 'IL' },
-    { name: 'Indiana', code: 'IN' },
-    { name: 'Iowa', code: 'IA' },
-    { name: 'Kansas', code: 'KS' },
-    { name: 'Kentucky', code: 'KY' },
-    { name: 'Louisiana', code: 'LA' },
-    { name: 'Maine', code: 'ME' },
-    { name: 'Maryland', code: 'MD' },
-    { name: 'Massachusetts', code: 'MA' },
-    { name: 'Michigan', code: 'MI' },
-    { name: 'Minnesota', code: 'MN' },
-    { name: 'Mississippi', code: 'MS' },
-    { name: 'Missouri', code: 'MO' },
-    { name: 'Montana', code: 'MT' },
-    { name: 'Nebraska', code: 'NE' },
-    { name: 'Nevada', code: 'NV' },
-    { name: 'New Hampshire', code: 'NH' },
-    { name: 'New Jersey', code: 'NJ' },
-    { name: 'New Mexico', code: 'NM' },
-    { name: 'New York', code: 'NY' },
-    { name: 'North Carolina', code: 'NC' },
-    { name: 'North Dakota', code: 'ND' },
-    { name: 'Ohio', code: 'OH' },
-    { name: 'Oklahoma', code: 'OK' },
-    { name: 'Oregon', code: 'OR' },
-    { name: 'Pennsylvania', code: 'PA' },
-    { name: 'Rhode Island', code: 'RI' },
-    { name: 'South Carolina', code: 'SC' },
-    { name: 'South Dakota', code: 'SD' },
-    { name: 'Tennessee', code: 'TN' },
-    { name: 'Texas', code: 'TX' },
-    { name: 'Utah', code: 'UT' },
-    { name: 'Vermont', code: 'VT' },
-    { name: 'Virginia', code: 'VA' },
-    { name: 'Washington', code: 'WA' },
-    { name: 'West Virginia', code: 'WV' },
-    { name: 'Wisconsin', code: 'WI' },
-    { name: 'Wyoming', code: 'WY' },
-    { name: 'District of Columbia', code: 'DC' }
+    // US states data...
   ],
   'IN': [
-    { name: 'Andhra Pradesh', code: 'AP' },
-    { name: 'Arunachal Pradesh', code: 'AR' },
-    { name: 'Assam', code: 'AS' },
-    { name: 'Bihar', code: 'BR' },
-    { name: 'Chhattisgarh', code: 'CG' },
-    { name: 'Goa', code: 'GA' },
-    { name: 'Gujarat', code: 'GJ' },
-    { name: 'Haryana', code: 'HR' },
-    { name: 'Himachal Pradesh', code: 'HP' },
-    { name: 'Jharkhand', code: 'JH' },
-    { name: 'Karnataka', code: 'KA' },
-    { name: 'Kerala', code: 'KL' },
-    { name: 'Madhya Pradesh', code: 'MP' },
-    { name: 'Maharashtra', code: 'MH' },
-    { name: 'Manipur', code: 'MN' },
-    { name: 'Meghalaya', code: 'ML' },
-    { name: 'Mizoram', code: 'MZ' },
-    { name: 'Nagaland', code: 'NL' },
-    { name: 'Odisha', code: 'OD' },
-    { name: 'Punjab', code: 'PB' },
-    { name: 'Rajasthan', code: 'RJ' },
-    { name: 'Sikkim', code: 'SK' },
-    { name: 'Tamil Nadu', code: 'TN' },
-    { name: 'Telangana', code: 'TG' },
-    { name: 'Tripura', code: 'TR' },
-    { name: 'Uttar Pradesh', code: 'UP' },
-    { name: 'Uttarakhand', code: 'UK' },
-    { name: 'West Bengal', code: 'WB' },
-    { name: 'Andaman and Nicobar Islands', code: 'AN' },
-    { name: 'Chandigarh', code: 'CH' },
-    { name: 'Dadra and Nagar Haveli and Daman and Diu', code: 'DH' },
-    { name: 'Delhi', code: 'DL' },
-    { name: 'Jammu and Kashmir', code: 'JK' },
-    { name: 'Ladakh', code: 'LA' },
-    { name: 'Lakshadweep', code: 'LD' },
-    { name: 'Puducherry', code: 'PY' }
+    // India states data...
   ],
-  'CA': [
-    { name: 'Alberta', code: 'AB' },
-    { name: 'British Columbia', code: 'BC' },
-    { name: 'Manitoba', code: 'MB' },
-    { name: 'New Brunswick', code: 'NB' },
-    { name: 'Newfoundland and Labrador', code: 'NL' },
-    { name: 'Northwest Territories', code: 'NT' },
-    { name: 'Nova Scotia', code: 'NS' },
-    { name: 'Nunavut', code: 'NU' },
-    { name: 'Ontario', code: 'ON' },
-    { name: 'Prince Edward Island', code: 'PE' },
-    { name: 'Quebec', code: 'QC' },
-    { name: 'Saskatchewan', code: 'SK' },
-    { name: 'Yukon', code: 'YT' }
-  ],
-  'GB': [
-    { name: 'England', code: 'ENG' },
-    { name: 'Northern Ireland', code: 'NIR' },
-    { name: 'Scotland', code: 'SCT' },
-    { name: 'Wales', code: 'WLS' }
-  ],
-  'AU': [
-    { name: 'Australian Capital Territory', code: 'ACT' },
-    { name: 'New South Wales', code: 'NSW' },
-    { name: 'Northern Territory', code: 'NT' },
-    { name: 'Queensland', code: 'QLD' },
-    { name: 'South Australia', code: 'SA' },
-    { name: 'Tasmania', code: 'TAS' },
-    { name: 'Victoria', code: 'VIC' },
-    { name: 'Western Australia', code: 'WA' }
-  ]
+  // Other countries...
 };
 
 // Set up EJS as the view engine
@@ -203,116 +100,178 @@ if (!fs.existsSync('./public/uploads')) {
   fs.mkdirSync('./public/uploads', { recursive: true });
 }
 
-// Create database directory if it doesn't exist
-if (!fs.existsSync('./database')) {
-  fs.mkdirSync('./database');
+// Create uploads directory if it doesn't exist
+if (!fs.existsSync('./public/uploads')) {
+  fs.mkdirSync('./public/uploads', { recursive: true });
 }
 
-// Initialize database
-const db = new sqlite3.Database('./database/lost_and_found.db', (err) => {
-  if (err) {
-    console.error('Error opening database', err);
-  } else {
-    console.log('Connected to the SQLite database.');
-    // Create tables if they don't exist
-    db.run(`CREATE TABLE IF NOT EXISTS items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT NOT NULL,
-      description TEXT,
-      category TEXT NOT NULL,
-      location TEXT NOT NULL,
-      country TEXT,
-      state TEXT,
-      city TEXT,
-      locality TEXT,
-      date TEXT NOT NULL,
-      contact TEXT NOT NULL,
-      type TEXT NOT NULL,
-      image1 TEXT,
-      image2 TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )`, (err) => {
-      if (err) {
-        console.error('Error creating items table', err);
-      } else {
-        console.log('Items table created or already exists.');
-        
-        // Add new columns to existing table if they don't exist
-        // Use a direct query without the callback to check if columns exist
-        db.all(`PRAGMA table_info(items)`, [], (err, rows) => {
-          if (err) {
-            console.error('Error checking table schema', err);
-            return;
-          }
-          
-          // Check if location columns exist
-          if (rows && Array.isArray(rows)) {
-            const columnNames = rows.map(row => row.name);
-            const hasCountry = columnNames.includes('country');
-            const hasState = columnNames.includes('state');
-            const hasCity = columnNames.includes('city');
-            const hasLocality = columnNames.includes('locality');
-            
-            // Add missing columns if needed
-            const columnsToAdd = [];
-            if (!hasCountry) columnsToAdd.push(`ALTER TABLE items ADD COLUMN country TEXT`);
-            if (!hasState) columnsToAdd.push(`ALTER TABLE items ADD COLUMN state TEXT`);
-            if (!hasCity) columnsToAdd.push(`ALTER TABLE items ADD COLUMN city TEXT`);
-            if (!hasLocality) columnsToAdd.push(`ALTER TABLE items ADD COLUMN locality TEXT`);
-            
-            if (columnsToAdd.length > 0) {
-              console.log('Adding missing location columns to items table...');
-              db.serialize(() => {
-                columnsToAdd.forEach(query => {
-                  db.run(query, err => {
-                    if (err) console.error('Error adding column:', err);
-                  });
-                });
-                console.log('Location columns added successfully.');
-              });
-            } else {
-              console.log('All required columns already exist in the items table.');
-            }
-          } else {
-            console.error('Invalid response from PRAGMA table_info');
-          }
-        });
-      }
-    });
+// Connect to MongoDB
+connectDB().catch(err => {
+  console.error('Failed to connect to MongoDB:', err);
+  process.exit(1);
+});
+
+// Express Session middleware
+app.use(session({
+  secret: process.env.JWT_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 1 day
   }
+}));
+
+// Cookie parser middleware
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+// Flash messages middleware
+const flash = require('connect-flash');
+app.use(flash());
+
+// Method override middleware to support PUT/DELETE in forms
+app.use(methodOverride('_method'));
+
+// Authentication middleware - Sets req.user if authenticated
+const authMiddleware = require('./middleware/auth');
+app.use(authMiddleware);
+
+// Require authentication middleware for protected routes
+const requireAuth = require('./middleware/requireAuth');
+
+// Global Variables for flash messages and user object
+app.use((req, res, next) => {
+  // Flash messages
+  res.locals.success_msg = req.flash('success');
+  res.locals.error_msg = req.flash('error');
+  res.locals.info_msg = req.flash('info');
+  
+  // Pass user object to all views
+  res.locals.user = req.user;
+  
+  next();
 });
 
 // Routes
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/', requireAuth, (req, res) => {
+  // Now we can be sure the user is authenticated due to requireAuth middleware
+  console.log('Home page accessed by:', req.user.email);
+  
+  if (req.user.role === 'admin') {
+    // Admins should be directed to admin dashboard
+    return res.redirect('/admin/dashboard');
+  }
+  
+  // Regular users see the homepage
+  res.render('index', { user: req.user });
+});
+
+// User Dashboard
+app.get('/dashboard', requireAuth, async (req, res) => {
+  try {
+    // Only for regular users
+    if (req.user.role === 'admin') {
+      return res.redirect('/admin/dashboard');
+    }
+    
+    // Get user's items
+    const userItems = await Item.find({ user: req.user._id })
+      .sort({ createdAt: 'desc' })
+      .exec();
+      
+    // Filter items by type and status
+    const userLostItems = userItems.filter(item => item.type === 'lost');
+    const userFoundItems = userItems.filter(item => item.type === 'found');
+    const userResolvedItems = userItems.filter(item => item.status === 'resolved');
+    
+    // Find potential matches
+    // For lost items, find similar found items and vice versa
+    const potentialMatches = [];
+    
+    // Simplified match logic - find items with same category
+    if (userLostItems.length > 0) {
+      // For each lost item, find potential found matches
+      for (const lostItem of userLostItems) {
+        const foundMatches = await Item.find({
+          type: 'found',
+          category: lostItem.category,
+          user: { $ne: req.user._id }, // Not the user's own items
+          status: 'active'
+        }).limit(2);
+        
+        potentialMatches.push(...foundMatches);
+      }
+    }
+    
+    if (userFoundItems.length > 0) {
+      // For each found item, find potential lost matches
+      for (const foundItem of userFoundItems) {
+        const lostMatches = await Item.find({
+          type: 'lost',
+          category: foundItem.category,
+          user: { $ne: req.user._id }, // Not the user's own items
+          status: 'active'
+        }).limit(2);
+        
+        potentialMatches.push(...lostMatches);
+      }
+    }
+    
+    // Remove duplicates from potential matches
+    const uniqueMatches = [];
+    const matchIds = new Set();
+    
+    for (const match of potentialMatches) {
+      if (!matchIds.has(match._id.toString())) {
+        matchIds.add(match._id.toString());
+        uniqueMatches.push(match);
+      }
+    }
+    
+    // Limit to 4 potential matches
+    const limitedMatches = uniqueMatches.slice(0, 4);
+    
+    // Generate recent activity (simplified for now)
+    const recentActivity = [];
+    
+    // Render the dashboard
+    res.render('dashboard', {
+      user: req.user,
+      userItems,
+      userLostItems,
+      userFoundItems,
+      userResolvedItems,
+      potentialMatches: limitedMatches,
+      recentActivity
+    });
+  } catch (err) {
+    console.error('Dashboard error:', err);
+    res.status(500).render('error', {
+      message: 'Error loading dashboard',
+      error: err
+    });
+  }
 });
 
 // Location data endpoints
 app.get('/api/countries', async (req, res) => {
   try {
-    // Check if we have cached data that's still valid
-    if (apiCache.countries && 
-        apiCache.countriesLastFetched && 
+    // Check cache first
+    if (apiCache.countries && apiCache.countriesLastFetched && 
         (Date.now() - apiCache.countriesLastFetched) < apiCache.cacheExpiryMs) {
       return res.json(apiCache.countries);
     }
     
-    // Fetch countries from REST Countries API
+    // Fetch from API
     const response = await fetch(COUNTRIES_API_URL);
+    const data = await response.json();
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch countries: ${response.status}`);
-    }
-    
-    const countriesData = await response.json();
-    
-    // Format countries data
-    const countries = countriesData
-      .sort((a, b) => a.name.common.localeCompare(b.name.common))
-      .map(country => ({
-        name: country.name.common,
-        code: country.cca2
-      }));
+    // Format data
+    const countries = data.map(country => ({
+      code: country.cca2,
+      name: country.name.common
+    })).sort((a, b) => a.name.localeCompare(b.name));
     
     // Update cache
     apiCache.countries = countries;
@@ -321,39 +280,23 @@ app.get('/api/countries', async (req, res) => {
     res.json(countries);
   } catch (error) {
     console.error('Error fetching countries:', error);
-    
-    // Return cached data if available, even if expired
-    if (apiCache.countries) {
-      res.json(apiCache.countries);
-    } else {
-      // Fallback to a limited set as last resort
-      res.json([
-        { name: 'United States', code: 'US' },
-        { name: 'India', code: 'IN' },
-        { name: 'United Kingdom', code: 'GB' },
-        { name: 'Canada', code: 'CA' },
-        { name: 'Australia', code: 'AU' }
-      ]);
-    }
+    res.status(500).json({ error: 'Failed to fetch countries' });
   }
 });
 
 app.get('/api/states/:countryCode', async (req, res) => {
-  const { countryCode } = req.params;
-  
   try {
-    // Check if we have cached data
+    const countryCode = req.params.countryCode.toUpperCase();
+    
+    // Check cache first
     if (apiCache.states[countryCode] && 
-        apiCache.states[countryCode].lastFetched && 
         (Date.now() - apiCache.states[countryCode].lastFetched) < apiCache.cacheExpiryMs) {
       return res.json(apiCache.states[countryCode].data);
     }
     
-    // Check if we have a common fallback data for this country
+    // Check if we have fallback data for this country
     if (commonStatesData[countryCode]) {
-      console.log(`Using fallback data for states in ${countryCode}`);
-      
-      // Update cache with the fallback data
+      // Update cache
       apiCache.states[countryCode] = {
         data: commonStatesData[countryCode],
         lastFetched: Date.now()
@@ -362,291 +305,120 @@ app.get('/api/states/:countryCode', async (req, res) => {
       return res.json(commonStatesData[countryCode]);
     }
     
-    // Try to fetch from GeoDB API
-    try {
-      // Fetch states (administrative divisions) from GeoDB API
-      const response = await fetch(
-        `${GEODB_API_URL}/countries/${countryCode}/regions?limit=50`,
-        {
-          headers: {
-            'X-RapidAPI-Key': GEODB_API_KEY,
-            'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch states: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      // Format states data
-      const states = data.data
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(state => ({
-          name: state.name,
-          code: state.isoCode || state.wikiDataId
-        }));
-      
-      // Update cache
-      apiCache.states[countryCode] = {
-        data: states,
-        lastFetched: Date.now()
-      };
-      
-      return res.json(states);
-    } catch (apiError) {
-      console.error(`Error fetching states for ${countryCode} from API:`, apiError);
-      
-      // Fall back to REST Countries API to get country info
-      const countryResponse = await fetch(`https://restcountries.com/v3.1/alpha/${countryCode}`);
-      
-      if (!countryResponse.ok) {
-        throw new Error(`Failed to fetch country: ${countryResponse.status}`);
-      }
-      
-      const countryData = await countryResponse.json();
-      
-      // Some countries might have 'subdivisions' field or similar
-      let states = [];
-      if (countryData[0] && countryData[0].subdivisions) {
-        states = Object.entries(countryData[0].subdivisions)
-          .map(([code, name]) => ({ name, code }))
-          .sort((a, b) => a.name.localeCompare(b.name));
-      }
-      
-      // Update cache
-      apiCache.states[countryCode] = {
-        data: states,
-        lastFetched: Date.now()
-      };
-      
-      return res.json(states);
-    }
+    // Fallback to empty array if no data available
+    apiCache.states[countryCode] = {
+      data: [],
+      lastFetched: Date.now()
+    };
+    
+    res.json([]);
   } catch (error) {
-    console.error(`Error fetching states for ${countryCode}:`, error);
-    
-    // Return cached data if available, even if expired
-    if (apiCache.states[countryCode]) {
-      return res.json(apiCache.states[countryCode].data);
-    }
-    
-    // If no cached data and no fallback, return empty array
-    return res.json([]);
+    console.error(`Error fetching states for ${req.params.countryCode}:`, error);
+    res.status(500).json({ error: 'Failed to fetch states' });
   }
 });
 
-app.get('/api/cities/:countryCode/:regionCode', async (req, res) => {
-  const { countryCode, regionCode } = req.params;
-  const cacheKey = `${countryCode}-${regionCode}`;
-  
+app.get('/api/cities/:countryCode/:stateCode', async (req, res) => {
   try {
-    // Check if we have cached data
+    const { countryCode, stateCode } = req.params;
+    const cacheKey = `${countryCode}-${stateCode}`;
+    
+    // Check cache first
     if (apiCache.cities[cacheKey] && 
-        apiCache.cities[cacheKey].lastFetched && 
         (Date.now() - apiCache.cities[cacheKey].lastFetched) < apiCache.cacheExpiryMs) {
       return res.json(apiCache.cities[cacheKey].data);
     }
     
-    // For US states, use a basic fallback with major cities
-    const usStateCities = {
-      'CA': [
-        { name: 'Los Angeles', code: 'LA' },
-        { name: 'San Francisco', code: 'SF' },
-        { name: 'San Diego', code: 'SD' },
-        { name: 'Sacramento', code: 'SAC' }
-      ],
-      'NY': [
-        { name: 'New York City', code: 'NYC' },
-        { name: 'Buffalo', code: 'BUF' },
-        { name: 'Albany', code: 'ALB' },
-        { name: 'Rochester', code: 'ROC' }
-      ],
-      'TX': [
-        { name: 'Houston', code: 'HOU' },
-        { name: 'Dallas', code: 'DAL' },
-        { name: 'Austin', code: 'AUS' },
-        { name: 'San Antonio', code: 'SAT' }
-      ]
-    };
-    
-    // For Indian states, use fallback data for major states
-    const indianStateCities = {
-      'MH': [
-        { name: 'Mumbai', code: 'BOM' },
-        { name: 'Pune', code: 'PNQ' },
-        { name: 'Nagpur', code: 'NAG' }
-      ],
-      'DL': [
-        { name: 'New Delhi', code: 'DEL' },
-        { name: 'Delhi', code: 'DLI' }
-      ],
-      'TN': [
-        { name: 'Chennai', code: 'MAA' },
-        { name: 'Coimbatore', code: 'CJB' },
-        { name: 'Madurai', code: 'IXM' }
-      ],
-      'KA': [
-        { name: 'Bangalore', code: 'BLR' },
-        { name: 'Mysore', code: 'MYQ' },
-        { name: 'Hubli', code: 'HBX' }
-      ],
-      'TG': [
-        { name: 'Hyderabad', code: 'HYD' },
-        { name: 'Warangal', code: 'WGC' }
-      ],
-      'WB': [
-        { name: 'Kolkata', code: 'CCU' },
-        { name: 'Siliguri', code: 'IXB' }
-      ]
-    };
-    
-    // Check for US fallback data
-    if (countryCode === 'US' && usStateCities[regionCode]) {
-      console.log(`Using US fallback data for cities in ${regionCode}`);
-      apiCache.cities[cacheKey] = {
-        data: usStateCities[regionCode],
-        lastFetched: Date.now()
-      };
-      return res.json(usStateCities[regionCode]);
-    }
-    
-    // Check for India fallback data
-    if (countryCode === 'IN' && indianStateCities[regionCode]) {
-      console.log(`Using India fallback data for cities in ${regionCode}`);
-      apiCache.cities[cacheKey] = {
-        data: indianStateCities[regionCode],
-        lastFetched: Date.now()
-      };
-      return res.json(indianStateCities[regionCode]);
-    }
-    
-    // Try to fetch from API
-    try {
-      // Fetch cities from GeoDB API
-      const response = await fetch(
-        `${GEODB_API_URL}/countries/${countryCode}/regions/${regionCode}/cities?limit=100&sort=-population`,
-        {
-          headers: {
-            'X-RapidAPI-Key': GEODB_API_KEY,
-            'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com'
-          }
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch cities: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      // Format cities data
-      const cities = data.data
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(city => ({
-          name: city.name,
-          code: city.wikiDataId
-        }));
-      
-      // Update cache
-      apiCache.cities[cacheKey] = {
-        data: cities,
-        lastFetched: Date.now()
-      };
-      
-      return res.json(cities);
-    } catch (error) {
-      console.error(`Error fetching cities from API: ${error.message}`);
-      // Continue to fallback options
-      throw error;
-    }
-  } catch (error) {
-    console.error(`Error fetching cities for ${countryCode}/${regionCode}:`, error);
-    
-    // Return cached data if available, even if expired
-    if (apiCache.cities[cacheKey]) {
-      return res.json(apiCache.cities[cacheKey].data);
-    }
-    
-    // If no cached data, return some generic cities as a last resort
-    const genericCities = [
-      { name: 'Main City', code: 'MAIN' },
-      { name: 'Central City', code: 'CTY' },
-      { name: 'Downtown', code: 'DWN' },
-      { name: 'Uptown', code: 'UPT' }
-    ];
-    
-    // Cache generic data to avoid future API calls for this region
+    // For simplicity, return empty array
+    // In a real app, you would call an actual API here
     apiCache.cities[cacheKey] = {
-      data: genericCities,
+      data: [],
       lastFetched: Date.now()
     };
     
-    return res.json(genericCities);
-  }
-});
-
-// Maintain the original API endpoint for backward compatibility
-app.get('/api/locations', async (req, res) => {
-  try {
-    // Try to fetch countries if we don't have them
-    if (!apiCache.countries) {
-      const countriesResponse = await fetch('/api/countries');
-      apiCache.countries = await countriesResponse.json();
-    }
-    
-    // Return a message to upgrade client-side code
-    res.json({
-      message: "Please update your client to use the new location API endpoints",
-      endpoints: {
-        countries: "/api/countries",
-        states: "/api/states/:countryCode",
-        cities: "/api/cities/:countryCode/:regionCode"
-      },
-      // Provide fallback data for backward compatibility
-      fallbackData: {
-        "United States": {
-          "California": {
-            "Los Angeles": ["Hollywood", "Downtown"],
-            "San Francisco": []
-          },
-          "New York": {
-            "New York City": ["Manhattan", "Brooklyn", "Queens"]
-          }
-        },
-        "India": {
-          "Maharashtra": {
-            "Mumbai": []
-          },
-          "Delhi": {
-            "New Delhi": []
-          }
-        }
-      }
-    });
+    res.json([]);
   } catch (error) {
-    console.error('Error in legacy location API:', error);
-    res.status(500).json({ error: 'Failed to fetch location data' });
+    console.error(`Error fetching cities:`, error);
+    res.status(500).json({ error: 'Failed to fetch cities' });
   }
 });
 
-// Item routes
-const itemRoutes = require('./routes/items');
-app.use('/items', itemRoutes(db, upload));
+// Load authentication middleware
+const requireAdmin = require('./middleware/requireAdmin');
+const redirectByRole = require('./middleware/redirectByRole');
+
+// Routes configuration
+const itemsRouter = require('./routes/items_new');  // Using our improved router
+const authRouter = require('./routes/auth');
+const adminRouter = require('./routes/admin');
+const adminItemsRouter = require('./routes/admin_items'); // New dedicated admin item management
+
+app.use('/auth', authRouter);
+app.use('/items', itemsRouter(upload));
+app.use('/admin', adminRouter);
+app.use('/admin_items', adminItemsRouter); // New dedicated admin item management routes
+
+// Set different layouts based on route
+app.use((req, res, next) => {
+  // Set admin layout for admin routes
+  if (req.path.startsWith('/admin')) {
+    app.set('layout', 'admin_layout');
+    // Override the default render function to ensure admin layout is used
+    const originalRender = res.render;
+    res.render = function(view, options, callback) {
+      options = options || {};
+      // Force the admin layout for all admin views
+      options.layout = 'admin_layout';
+      originalRender.call(this, view, options, callback);
+    };
+  } else {
+    // Use default layout for all other routes
+    app.set('layout', 'layout_new');
+  }
+  next();
+});
+
+// Auth routes are always public - do not require auth
+app.use('/auth', authRouter);
+
+// Public routes for static files
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+
+// API routes (needed for filtering to work properly)
+app.use('/api', (req, res, next) => {
+  // Allow API access for authenticated users
+  if (req.user) {
+    next();
+  } else {
+    res.status(401).json({ error: 'Authentication required' });
+  }
+});
+
+// Role-based redirection middleware
+app.use(redirectByRole);
+
+// ALL other routes require authentication
+app.use('/', requireAuth);
+
+// Items routes
+app.use('/items', itemsRouter(upload));
+
+// Admin routes - require admin role
+app.use('/admin', requireAdmin, adminRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Server error:', err);
-  res.status(500).render('error', { 
+  console.error(err.stack);
+  res.status(500).render('error', {
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err : {}
   });
 });
 
-// Handle 404 errors
+// 404 handler
 app.use((req, res) => {
-  res.status(404).render('error', { 
+  res.status(404).render('error', {
     message: 'Page not found',
     error: { status: 404 }
   });
@@ -655,4 +427,6 @@ app.use((req, res) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-}); 
+});
+
+module.exports = app;

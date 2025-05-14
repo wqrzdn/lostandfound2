@@ -1,0 +1,95 @@
+<!-- Database Cleanup Page -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><i class="fas fa-broom text-warning me-2"></i> Database Cleanup</h1>
+  <div>
+    <a href="/admin/dashboard" class="btn btn-outline-primary me-2">
+      <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+    </a>
+    <a href="/" class="btn btn-outline-secondary">
+      <i class="fas fa-home me-1"></i> Home
+    </a>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-light">
+        <h4 class="mb-0"><i class="fas fa-database me-2"></i> Database Health</h4>
+      </div>
+      <div class="card-body">
+        <% if (dbHealth) { %>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Connection Status
+              <span class="badge <%= dbHealth.connected ? 'bg-success' : 'bg-danger' %> rounded-pill">
+                <%= dbHealth.connected ? 'Connected' : 'Disconnected' %>
+              </span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Database Size
+              <span class="badge bg-primary rounded-pill"><%= dbHealth.size || 'Unknown' %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Items Count
+              <span class="badge bg-primary rounded-pill"><%= dbHealth.itemCount || 0 %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Old Items (>180 days)
+              <span class="badge bg-warning rounded-pill"><%= dbHealth.oldItemCount || 0 %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Active Items
+              <span class="badge bg-success rounded-pill"><%= dbHealth.activeCount || 0 %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Resolved Items
+              <span class="badge bg-info rounded-pill"><%= dbHealth.resolvedCount || 0 %></span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Last Check
+              <span><%= dbHealth.lastCheck ? new Date(dbHealth.lastCheck).toLocaleString() : 'Unknown' %></span>
+            </li>
+          </ul>
+        <% } else { %>
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i> Could not retrieve database health information.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header bg-light">
+        <h4 class="mb-0"><i class="fas fa-trash-alt me-2"></i> Cleanup Options</h4>
+      </div>
+      <div class="card-body">
+        <form action="/admin/cleanup" method="POST">
+          <div class="mb-3">
+            <label for="daysOld" class="form-label">Delete items older than (days):</label>
+            <input type="number" id="daysOld" name="daysOld" class="form-control" value="180" min="30" max="365">
+            <div class="form-text text-muted">
+              Items older than the specified number of days will be permanently deleted.
+            </div>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="confirmBackup" required>
+            <label class="form-check-label" for="confirmBackup">
+              I understand that a backup will be created before deletion
+            </label>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-broom me-1"></i> Perform Cleanup
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-warning">
+  <i class="fas fa-exclamation-triangle me-2"></i> <strong>Warning:</strong> This operation cannot be undone. A backup will be created automatically before cleanup.
+</div> 

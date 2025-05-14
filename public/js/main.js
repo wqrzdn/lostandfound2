@@ -1,6 +1,18 @@
 // Main JavaScript file for Lost and Found application
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Ensure all navigation links work properly
+  const navLinks = document.querySelectorAll('.nav-link, .navbar-brand, .dropdown-item');
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href !== '#' && !this.classList.contains('dropdown-toggle')) {
+        // Allow normal navigation
+        return true;
+      }
+    });
+  });
+
   // Initialize Bootstrap tooltips
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   tooltipTriggerList.map(function(tooltipTriggerEl) {
