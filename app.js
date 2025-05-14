@@ -9,6 +9,7 @@ const fetch = require('node-fetch');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const session = require('express-session');
+const passport = require('passport');
 
 // Load environment variables
 dotenv.config();
@@ -111,6 +112,9 @@ connectDB().catch(err => {
   process.exit(1);
 });
 
+// Initialize Passport
+require('./config/passport');
+
 // Express Session middleware
 app.use(session({
   secret: process.env.JWT_SECRET || 'secret',
@@ -121,6 +125,10 @@ app.use(session({
     maxAge: 24 * 60 * 60 * 1000 // 1 day
   }
 }));
+
+// Initialize Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Cookie parser middleware
 const cookieParser = require('cookie-parser');
@@ -137,6 +145,10 @@ app.use(methodOverride('_method'));
 const authMiddleware = require('./middleware/auth');
 app.use(authMiddleware);
 
+// Google authentication handler middleware
+const googleAuthHandler = require('./middleware/googleAuthHandler');
+app.use(googleAuthHandler);
+
 // Require authentication middleware for protected routes
 const requireAuth = require('./middleware/requireAuth');
 
@@ -148,7 +160,8 @@ app.use((req, res, next) => {
   res.locals.info_msg = req.flash('info');
   
   // Pass user object to all views
-  res.locals.user = req.user;
+  // For Passport authentication, req.user will be set by Passport
+  res.locals.user = req.user || res.locals.user;
   
   next();
 });

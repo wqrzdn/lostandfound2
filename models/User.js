@@ -16,8 +16,17 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: function() {
+      // Password is required only if googleId is not provided
+      return !this.googleId;
+    }
   },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  
   role: {
     type: String,
     enum: ['user', 'admin'],
@@ -56,8 +65,8 @@ UserSchema.pre('save', async function(next) {
   // Update the updatedAt field
   this.updatedAt = Date.now();
   
-  // Only hash the password if it has been modified (or is new)
-  if (!this.isModified('password')) return next();
+  // Only hash the password if it exists, has been modified, and is not empty
+  if (!this.password || !this.isModified('password')) return next();
   
   try {
     const salt = await bcrypt.genSalt(10);
@@ -70,6 +79,8 @@ UserSchema.pre('save', async function(next) {
 
 // Method to check password
 UserSchema.methods.matchPassword = async function(enteredPassword) {
+  // If user has no password (Google auth user), always return false
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

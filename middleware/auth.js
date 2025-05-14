@@ -3,12 +3,22 @@ const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
   try {
-    // Get token from cookies
+    // If user is already authenticated via Passport (Google OAuth)
+    if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+      // User is already authenticated via Passport, no need to verify JWT
+      res.locals.user = req.user;
+      console.log(`User authenticated via Passport: ${req.user.email} (${req.user.role})`);
+      return next();
+    }
+    
+    // Get token from cookies for JWT authentication
     const token = req.cookies.token;
     
     // Set default - no authenticated user
-    req.user = null;
-    res.locals.user = null;
+    if (!req.user) {
+      req.user = null;
+      res.locals.user = null;
+    }
     
     // Skip token verification if no token exists
     if (!token) {
@@ -27,15 +37,18 @@ module.exports = async (req, res, next) => {
         req.user = user;
         res.locals.user = user;
         
-        console.log(`User authenticated: ${user.email} (${user.role})`);
+        console.log(`User authenticated via JWT: ${user.email} (${user.role})`);
       }
     }
     
     next();
   } catch (err) {
     console.error('Auth middleware error:', err);
-    req.user = null;
-    res.locals.user = null;
+    // Don't reset req.user if it's already set by Passport
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      req.user = null;
+      res.locals.user = null;
+    }
     next();
   }
 };

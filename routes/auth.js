@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
 
 // Display login page
 router.get('/login', (req, res) => {
@@ -17,6 +18,61 @@ router.get('/login', (req, res) => {
     error: null
   });
 });
+
+// Google OAuth Login Route
+router.get('/google', passport.authenticate('google', { 
+  scope: ['profile', 'email'] 
+}));
+
+// Google OAuth Callback Route
+router.get('/google/callback', 
+  passport.authenticate('google', { 
+    failureRedirect: '/auth/login',
+    failureFlash: true
+  }), 
+  (req, res) => {
+    try {
+      // Create JWT token for the authenticated user
+      const token = jwt.sign(
+        { id: req.user._id },
+        process.env.JWT_SECRET || 'fallback_secret_key',
+        { expiresIn: '24h' }
+      );
+      
+      // Set cookie with token
+      res.cookie('token', token, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        path: '/' // Ensure cookie is available across the site
+      });
+      
+      // Update last login timestamp if the method exists
+      if (typeof req.user.updateLoginTimestamp === 'function') {
+        req.user.updateLoginTimestamp();
+      }
+      
+      // Success message and redirect based on role
+      console.log('Google login successful for:', req.user.email, 'Role:', req.user.role);
+      
+      // Redirect to the appropriate page based on user role
+      if (req.user.role === 'admin') {
+        req.flash('success', 'Welcome to Admin Dashboard');
+        return res.redirect('/admin/dashboard');
+      } else {
+        // Check if there was a return URL stored in the session
+        const returnTo = req.session.returnTo || '/';
+        delete req.session.returnTo;
+        
+        req.flash('success', 'Login successful! Welcome back.');
+        return res.redirect(returnTo);
+      }
+    } catch (err) {
+      console.error('Google callback route error:', err);
+      req.flash('error', 'An error occurred during Google login');
+      res.redirect('/auth/login');
+    }
+  }
+);
 
 // Display register page
 router.get('/register', (req, res) => {
@@ -135,9 +191,12 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Logout route - completely rewritten to eliminate any session or flash-related errors
+// Logout route - handles both JWT and Passport authentication
 router.get('/logout', (req, res) => {
   try {
+    // Get user info for logging before logout
+    const userEmail = req.user ? req.user.email : 'Unknown user';
+    
     // 1. Clear the JWT token cookie
     res.clearCookie('token', {
       path: '/',
@@ -151,14 +210,26 @@ router.get('/logout', (req, res) => {
       res.clearCookie(cookieName, { path: '/' });
     }
 
-    // 3. Reset any session data without callback (avoiding async issues)
-    if (req.session) {
-      req.session = null;
+    // 3. Handle Passport logout if available
+    if (req.logout) {
+      req.logout(function(err) {
+        if (err) {
+          console.error('Passport logout error:', err);
+        }
+      });
     }
 
-    // 4. Force redirect to login without using flash messages
-    // Using a query parameter instead of flash to show success message
-    console.log('User logged out successfully');
+    // 4. Reset any session data
+    if (req.session) {
+      req.session.destroy(function(err) {
+        if (err) {
+          console.error('Session destroy error:', err);
+        }
+      });
+    }
+
+    // 5. Log and redirect
+    console.log(`User logged out successfully: ${userEmail}`);
     return res.redirect('/auth/login?status=loggedout');
   } catch (error) {
     console.error('Logout error:', error);
