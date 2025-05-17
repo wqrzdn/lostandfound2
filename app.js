@@ -429,15 +429,6 @@ app.get('/', (req, res) => {
   res.redirect('/items');
 });
 
-<<<<<<< HEAD
-// Profile route
-app.get('/profile', (req, res) => {
-  try {
-    res.render('profile', { 
-      user: req.user,
-      layout: 'layout_new'
-    });
-=======
 // Role-based redirection middleware
 app.use(redirectByRole);
 
@@ -451,8 +442,10 @@ app.use('/items', itemsRouter(upload));
 app.get('/profile', requireAuth, (req, res) => {
   try {
     // Ensure user is authenticated (requireAuth middleware already does this)
-    res.render('profile', { user: req.user });
->>>>>>> 34c69031251fc59add079b2aff375f20962067dc
+    res.render('profile', { 
+      user: req.user,
+      layout: 'layout_new'
+    });
   } catch (error) {
     console.error('Profile route error:', error);
     res.status(500).render('error', {
@@ -461,12 +454,9 @@ app.get('/profile', requireAuth, (req, res) => {
     });
   }
 });
-<<<<<<< HEAD
-=======
 
 // Admin routes - require admin role
 app.use('/admin', requireAdmin, adminRouter);
->>>>>>> 34c69031251fc59add079b2aff375f20962067dc
 
 // Error handling middleware
 app.use((err, req, res, next) => {
