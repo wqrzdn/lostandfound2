@@ -13,9 +13,13 @@ router.get('/login', (req, res) => {
     successMessage = 'You have been successfully logged out';
   }
   
+  // Get redirect URL from query parameter or default to dashboard
+  const redirectTo = req.query.redirect || '/dashboard';
+  
   res.render('auth/login', { 
     success: successMessage,
-    error: null
+    error: null,
+    redirectTo
   });
 });
 
@@ -121,14 +125,14 @@ router.post('/register', async (req, res) => {
 // Login route
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, redirectTo } = req.body;
     
     console.log('Login attempt for:', email);
     
     // Basic validation
     if (!email || !password) {
       req.flash('error', 'Please provide email and password');
-      return res.render('auth/login', { error: 'Please provide email and password' });
+      return res.render('auth/login', { error: 'Please provide email and password', redirectTo });
     }
     
     // Find user
@@ -136,7 +140,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
       console.log('Login failed: User not found -', email);
       req.flash('error', 'Invalid credentials');
-      return res.render('auth/login', { error: 'Invalid credentials' });
+      return res.render('auth/login', { error: 'Invalid credentials', redirectTo });
     }
     
     // Check password - Using try/catch for robust error handling
@@ -146,14 +150,17 @@ router.post('/login', async (req, res) => {
     } catch (err) {
       console.error('Password verification error:', err.message);
       req.flash('error', 'Authentication error');
-      return res.render('auth/login', { error: 'Authentication error' });
+      return res.render('auth/login', { error: 'Authentication error', redirectTo });
     }
     
     if (!isMatch) {
       console.log('Login failed: Invalid password for', email);
       req.flash('error', 'Invalid credentials');
-      return res.render('auth/login', { error: 'Invalid credentials' });
+      return res.render('auth/login', { error: 'Invalid credentials', redirectTo });
     }
+    
+    // Simple log of successful login
+    console.log('User authenticated successfully:', user.email);
     
     // Authentication successful - create token
     const token = jwt.sign(
@@ -182,12 +189,24 @@ router.post('/login', async (req, res) => {
       return res.redirect('/admin/dashboard');
     } else {
       req.flash('success', 'Login successful! Welcome back.');
-      return res.redirect('/');
+      // Redirect to the specified URL or dashboard
+      return res.redirect(redirectTo || '/dashboard');
     }
   } catch (err) {
     console.error('Login route error:', err);
-    req.flash('error', 'An error occurred during login');
-    res.render('auth/login', { error: 'Server error during login' });
+    console.error('Error details:', err.stack);
+    // Provide more specific error messages based on the type of error
+    if (err.name === 'ValidationError') {
+      req.flash('error', 'Invalid data provided: ' + err.message);
+      return res.render('auth/login', { error: 'Invalid data provided', redirectTo });
+    } else if (err.name === 'MongoError' || err.name === 'MongoServerError') {
+      req.flash('error', 'Database connection issue. Please try again later.');
+      return res.render('auth/login', { error: 'Database connection issue', redirectTo });
+    } else {
+      // For any other errors, log detailed info but show a generic message to user
+      req.flash('error', 'An error occurred during login');
+      return res.render('auth/login', { error: 'Authentication error: ' + (process.env.NODE_ENV === 'development' ? err.message : 'Please try again'), redirectTo });
+    }
   }
 });
 
@@ -196,6 +215,7 @@ router.get('/logout', (req, res) => {
   try {
     // Get user info for logging before logout
     const userEmail = req.user ? req.user.email : 'Unknown user';
+    console.log(`Logging out user: ${userEmail}`);
     
     // 1. Clear the JWT token cookie
     res.clearCookie('token', {
@@ -204,31 +224,31 @@ router.get('/logout', (req, res) => {
       secure: process.env.NODE_ENV === 'production'
     });
     
-    // 2. Clear all cookies to be thorough
-    const cookies = req.cookies;
-    for (const cookieName in cookies) {
-      res.clearCookie(cookieName, { path: '/' });
-    }
-
-    // 3. Handle Passport logout if available
-    if (req.logout) {
-      req.logout(function(err) {
-        if (err) {
-          console.error('Passport logout error:', err);
-        }
-      });
-    }
-
-    // 4. Reset any session data
+    // 2. Clear session if it exists, but don't try to regenerate it
     if (req.session) {
-      req.session.destroy(function(err) {
-        if (err) {
-          console.error('Session destroy error:', err);
-        }
-      });
+      console.log('Clearing session...');
+      req.session = null;
     }
 
-    // 5. Log and redirect
+    // 3. Handle Passport logout with a safe approach
+    if (req.logout && typeof req.logout === 'function') {
+      try {
+        // For Passport v0.6.0 and newer that requires a callback
+        req.logout(function() {
+          console.log('Passport logout completed');
+        });
+      } catch (logoutErr) {
+        // For older Passport versions or if callback approach fails
+        try {
+          req.logout();
+          console.log('Legacy passport logout completed');
+        } catch (legacyErr) {
+          console.log('Could not perform passport logout:', legacyErr.message);
+        }
+      }
+    }
+
+    // 4. Log and redirect - don't wait for session operations
     console.log(`User logged out successfully: ${userEmail}`);
     return res.redirect('/auth/login?status=loggedout');
   } catch (error) {

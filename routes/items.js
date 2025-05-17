@@ -18,19 +18,38 @@ const itemRoutes = {
   router.get('/', async (req, res) => {
     try {
       // Get filter parameters from query string
-      const { type, category, country, state, city, location, date, keyword, seeded } = req.query;
+      const { type, category, country, state, city, location, date, keyword, seeded, isSchoolArea } = req.query;
       
       console.log('Filter parameters:', req.query); // Debug log
       
       // Build MongoDB filter
       const filter = {};
       if (type) filter.type = type.toLowerCase();
-      if (category) filter.category = category;
+      if (category) {
+        if (category === 'School/College') {
+          // For School/College filter, we need to ensure we get all relevant items
+          // This includes both items explicitly tagged with School/College category
+          // and items with isSchoolArea flag
+          filter.$or = [
+            { category: 'School/College' },
+            { isSchoolArea: true }
+          ];
+        } else {
+          filter.category = category;
+        }
+      }
       if (country) filter.country = country;
       if (state) filter.state = state;
       if (city) filter.city = city;
       if (location) filter.location = new RegExp(location, 'i');
       if (date) filter.date = date;
+      if (isSchoolArea === 'true') {
+        // If isSchoolArea filter is explicitly applied, we want only school/college items
+        if (!filter.$or) {
+          filter.isSchoolArea = true;
+        }
+        // If category filter is already using $or for School/College, we don't need to modify it
+      }
       if (keyword) {
         filter.$or = [
           { title: new RegExp(keyword, 'i') },
@@ -86,7 +105,8 @@ const itemRoutes = {
           
           return res.render('items/index', {
             items: seededItems,
-            type, category, country, state, city, location, date, keyword,
+            type, category, country, state, city, location, date, keyword, 
+            isSchoolArea: typeof isSchoolArea !== 'undefined' ? isSchoolArea : 'false',
             moment,
             message: 'Welcome! We\'ve added some sample items to get you started.'
           });
@@ -95,7 +115,8 @@ const itemRoutes = {
       
       res.render('items/index', {
         items,
-        type, category, country, state, city, location, date, keyword,
+        type, category, country, state, city, location, date, keyword, 
+        isSchoolArea: typeof isSchoolArea !== 'undefined' ? isSchoolArea : 'false',
         moment,
         message: seeded === 'true' ? 'Test items added successfully!' : null
       });
@@ -120,16 +141,46 @@ const itemRoutes = {
       console.log('Request body:', req.body);
       console.log('Files:', req.files ? req.files.length : 0);
       
-      const { 
-        title, description, category, location, 
-        countryName, stateName, cityName, locality,
-        date, contact, type, latitude, longitude
-      } = req.body;
+      // Check if it's a School/College form submission
+      const isSchoolArea = req.body.isSchoolArea === 'true';
       
-      // Use the name values instead of codes
-      const country = countryName || req.body.country;
-      const state = stateName || req.body.state;
-      const city = cityName || req.body.city;
+      let title, description, category, location, date, contact, type;
+      let country, state, city, locality;
+      
+      if (isSchoolArea) {
+        // Handle School/College form data
+        const { schoolName, schoolLocation, schoolDate, schoolItemDescription, schoolContact } = req.body;
+        
+        // Map school form fields to standard item fields
+        title = `School/College Item: ${schoolItemDescription && schoolItemDescription.substring(0, 50)}...`;
+        description = schoolItemDescription;
+        category = 'Other'; // Default category for school items
+        location = schoolLocation;
+        date = schoolDate;
+        contact = schoolContact;
+        type = req.body.type || 'Lost'; // Default to Lost if not specified
+        
+        // Set school fields
+        country = "School/College Area";
+        state = schoolName;
+        city = schoolLocation;
+      } else {
+        // Handle standard form data
+        const extractedData = req.body;
+        title = extractedData.title;
+        description = extractedData.description;
+        category = extractedData.category;
+        location = extractedData.location;
+        date = extractedData.date;
+        contact = extractedData.contact;
+        type = extractedData.type;
+        
+        // Use the name values instead of codes
+        country = extractedData.countryName || extractedData.country;
+        state = extractedData.stateName || extractedData.state;
+        city = extractedData.cityName || extractedData.city;
+        locality = extractedData.locality;
+      }
       
       console.log('Extracted data:', { title, category, country, state, city, date, contact, type });
       
@@ -172,10 +223,15 @@ const itemRoutes = {
         image1,
         image2,
         createdAt: new Date(),
+        isSchoolArea, // Add the isSchoolArea flag
+        schoolName: isSchoolArea ? state : undefined, // If school area, use state as school name
+        schoolLocation: isSchoolArea ? city : undefined, // If school area, use city as school location
         status: 'active'
       });
       
       // Add coordinates if latitude and longitude are provided
+      const latitude = req.body.latitude;
+      const longitude = req.body.longitude;
       if (latitude && longitude) {
         newItem.coordinates = {
           type: 'Point',
@@ -275,10 +331,18 @@ const itemRoutes = {
         });
       }
       
-      res.render('items/edit', {
-        item,
-        req
-      });
+      // Check if the user is authorized to edit the item (must be the owner or an admin)
+      if (req.user && (req.user.role === 'admin' || (item.user && item.user.toString() === req.user._id.toString()))) {
+        res.render('items/edit', {
+          item,
+          req
+        });
+      } else {
+        return res.status(403).render('error', {
+          message: 'Access Denied',
+          error: { status: 403, message: 'You do not have permission to edit this item. Only the item owner or an administrator can edit items.' }
+        });
+      }
     } catch (error) {
       console.error('Error in edit item route:', error);
       res.status(500).render('error', {
@@ -301,6 +365,24 @@ const itemRoutes = {
         });
       }
       
+      // Get existing item to check ownership
+      const existingItem = await Item.findById(id);
+      
+      if (!existingItem) {
+        return res.status(404).render('error', {
+          message: 'Item not found',
+          error: { status: 404, message: 'The requested item does not exist or has been removed.' }
+        });
+      }
+      
+      // Check if the user is authorized to update the item (must be the owner or an admin)
+      if (!(req.user && (req.user.role === 'admin' || (existingItem.user && existingItem.user.toString() === req.user._id.toString())))) {
+        return res.status(403).render('error', {
+          message: 'Access Denied',
+          error: { status: 403, message: 'You do not have permission to update this item. Only the item owner or an administrator can update items.' }
+        });
+      }
+      
       const { 
         title, description, category, location, 
         countryName, stateName, cityName, locality,
@@ -315,16 +397,6 @@ const itemRoutes = {
       // Validate required fields
       if (!title || !category || !country || !state || !city || !date || !contact || !type) {
         return res.status(400).send('All required fields must be filled');
-      }
-      
-      // Get existing item to check for image changes
-      const existingItem = await Item.findById(id);
-      
-      if (!existingItem) {
-        return res.status(404).render('error', {
-          message: 'Item not found',
-          error: { status: 404, message: 'The requested item does not exist or has been removed.' }
-        });
       }
       
       // Process uploaded images
@@ -417,6 +489,14 @@ const itemRoutes = {
         });
       }
       
+      // Check if the user is authorized to delete the item (must be the owner or an admin)
+      if (!(req.user && (req.user.role === 'admin' || (item.user && item.user.toString() === req.user._id.toString())))) {
+        return res.status(403).render('error', {
+          message: 'Access Denied',
+          error: { status: 403, message: 'You do not have permission to delete this item. Only the item owner or an administrator can delete items.' }
+        });
+      }
+      
       // Delete associated images
       if (item.image1 && fs.existsSync(path.join(__dirname, '..', 'public', item.image1))) {
         fs.unlinkSync(path.join(__dirname, '..', 'public', item.image1));
@@ -459,18 +539,29 @@ const itemRoutes = {
         });
       }
       
-      // Update the item status
-      const updatedItem = await Item.findByIdAndUpdate(id, {
-        status: 'resolved',
-        updatedAt: new Date()
-      }, { new: true });
+      // Get the item to check ownership
+      const item = await Item.findById(id);
       
-      if (!updatedItem) {
+      if (!item) {
         return res.status(404).render('error', {
           message: 'Item not found',
           error: { status: 404, message: 'The requested item does not exist or has been removed.' }
         });
       }
+      
+      // Check if the user is authorized to resolve the item (must be the owner or an admin)
+      if (!(req.user && (req.user.role === 'admin' || (item.user && item.user.toString() === req.user._id.toString())))) {
+        return res.status(403).render('error', {
+          message: 'Access Denied',
+          error: { status: 403, message: 'You do not have permission to resolve this item. Only the item owner or an administrator can resolve items.' }
+        });
+      }
+      
+      // Update the item status
+      const updatedItem = await Item.findByIdAndUpdate(id, {
+        status: 'resolved',
+        updatedAt: new Date()
+      }, { new: true });
       
       res.redirect(`/items/${id}`);
     } catch (error) {

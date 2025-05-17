@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Items - Lost and Found</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+  <!-- Navigation -->
+  <nav class="bg-white shadow">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex">
+          <div class="flex-shrink-0 flex items-center">
+            <img class="h-8 w-auto" src="/images/logo.png" alt="Lost and Found" onerror="this.src='/images/default-logo.png'; this.onerror=''">
+            <span class="ml-2 text-xl font-bold text-gray-800">Lost & Found</span>
+          </div>
+          <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <a href="/public/browse" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+              Browse Items
+            </a>
+          </div>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+          <a href="/auth/login" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            Sign In
+          </a>
+          <a href="/auth/register" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+            Sign Up
+          </a>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <!-- Mobile menu button -->
+          <button type="button" class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-expanded="false">
+            <span class="sr-only">Open main menu</span>
+            <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state -->
+    <div class="mobile-menu hidden sm:hidden">
+      <div class="pt-2 pb-3 space-y-1">
+        <a href="/public/browse" class="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
+          Browse Items
+        </a>
+      </div>
+      <div class="pt-4 pb-3 border-t border-gray-200">
+        <div class="flex items-center px-4">
+          <div class="flex-shrink-0">
+            <img class="h-10 w-10 rounded-full" src="/images/default-avatar.png" alt="">
+          </div>
+          <div class="ml-3">
+            <div class="text-base font-medium text-gray-800">Guest</div>
+            <div class="text-sm font-medium text-gray-500">Not signed in</div>
+          </div>
+        </div>
+        <div class="mt-3 space-y-1">
+          <a href="/auth/login" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            Sign In
+          </a>
+          <a href="/auth/register" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">
+            Sign Up
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <div class="bg-indigo-600">
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:py-12 lg:px-8 lg:flex lg:items-center lg:justify-between">
+      <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+        <span class="block">Looking for something?</span>
+        <span class="block text-indigo-200">Browse lost and found items</span>
+      </h2>
+      <div class="mt-8 flex lg:mt-0 lg:flex-shrink-0">
+        <div class="inline-flex rounded-md shadow">
+          <a href="/auth/register" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50">
+            Sign up to post
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="bg-white rounded-lg shadow p-4">
+      <h3 class="text-lg font-medium text-gray-900 mb-3">Filter Items</h3>
+      <form id="filter-form" class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+          <select id="type" name="type" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="">All Types</option>
+            <option value="lost">Lost Items</option>
+            <option value="found">Found Items</option>
+          </select>
+        </div>
+        <div>
+          <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+          <select id="category" name="category" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <option value="">All Categories</option>
+            <option value="electronics">Electronics</option>
+            <option value="jewelry">Jewelry</option>
+            <option value="clothing">Clothing</option>
+            <option value="documents">Documents</option>
+            <option value="pets">Pets</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="location" class="block text-sm font-medium text-gray-700">Location</label>
+          <input type="text" id="location" name="location" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter location...">
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <i class="fas fa-filter mr-2"></i> Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Items Grid -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Browse Items</h2>
+    
+    <% if (items && items.length > 0) { %>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <% items.forEach(item => { %>
+          <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="relative h-48 w-full overflow-hidden bg-gray-200">
+              <% if (item.image1) { %>
+                <img src="<%= item.image1 %>" alt="<%= item.title %>" class="w-full h-full object-cover">
+              <% } else { %>
+                <div class="flex items-center justify-center h-full w-full bg-gray-100">
+                  <i class="fas fa-image text-gray-400 text-4xl"></i>
+                </div>
+              <% } %>
+              <div class="absolute top-2 right-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= item.type === 'lost' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' %>">
+                  <%= item.type === 'lost' ? 'Lost' : 'Found' %>
+                </span>
+              </div>
+            </div>
+            <div class="p-4">
+              <h3 class="text-lg font-medium text-gray-900 truncate"><%= item.title %></h3>
+              <p class="mt-1 text-sm text-gray-500 line-clamp-2"><%= item.description %></p>
+              <div class="mt-4 flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                  <i class="fas fa-map-marker-alt mr-1"></i> <%= item.location %>
+                </div>
+                <div class="text-sm text-gray-500">
+                  <i class="far fa-calendar mr-1"></i> <%= new Date(item.date).toLocaleDateString() %>
+                </div>
+              </div>
+              <div class="mt-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <%= item.category %>
+                </span>
+              </div>
+              <div class="mt-4">
+                <a href="/auth/login" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  Sign in to contact
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="text-center py-12 bg-white rounded-lg shadow">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No items found</h3>
+        <p class="mt-1 text-sm text-gray-500">Try adjusting your search filters or check back later.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Pagination -->
+  <% if (items && items.length > 0 && totalPages > 1) { %>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex justify-center">
+        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %>&type=<%= query.type || '' %>&category=<%= query.category || '' %>&location=<%= query.location || '' %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <span class="sr-only">Previous</span>
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+              </svg>
+            </a>
+          <% } %>
+          
+          <% for(let i = 1; i <= totalPages; i++) { %>
+            <a href="?page=<%= i %>&type=<%= query.type || '' %>&category=<%= query.category || '' %>&location=<%= query.location || '' %}" 
+               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium <%= currentPage === i ? 'text-indigo-600 bg-indigo-50' : 'text-gray-700 hover:bg-gray-50' %>">
+              <%= i %>
+            </a>
+          <% } %>
+          
+          <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %>&type=<%= query.type || '' %>&category=<%= query.category || '' %>&location=<%= query.location || '' %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <span class="sr-only">Next</span>
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+              </svg>
+            </a>
+          <% } %>
+        </nav>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Footer -->
+  <footer class="bg-white">
+    <div class="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
+      <nav class="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
+        <div class="px-5 py-2">
+          <a href="/public/browse" class="text-base text-gray-500 hover:text-gray-900">Browse</a>
+        </div>
+        <div class="px-5 py-2">
+          <a href="/auth/login" class="text-base text-gray-500 hover:text-gray-900">Sign In</a>
+        </div>
+        <div class="px-5 py-2">
+          <a href="/auth/register" class="text-base text-gray-500 hover:text-gray-900">Sign Up</a>
+        </div>
+      </nav>
+      <p class="mt-8 text-center text-base text-gray-400">&copy; 2025 Lost and Found. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuButton = document.querySelector('.mobile-menu-button');
+      const mobileMenu = document.querySelector('.mobile-menu');
+      
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+      
+      // Filter form handling
+      const filterForm = document.getElementById('filter-form');
+      if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const type = document.getElementById('type').value;
+          const category = document.getElementById('category').value;
+          const location = document.getElementById('location').value;
+          
+          let url = '/public/browse?';
+          if (type) url += `type=${type}&`;
+          if (category) url += `category=${category}&`;
+          if (location) url += `location=${location}&`;
+          
+          window.location.href = url;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

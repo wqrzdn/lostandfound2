@@ -5,6 +5,7 @@
 
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const connectDB = require('../config/database');
 const Item = require('../models/Item');
 const User = require('../models/User');
@@ -50,11 +51,15 @@ const cleanupDatabase = async (daysOld = 180) => {
 
 
 /**
- * Check database health
+ * Check database health with MongoDB Atlas specific metrics
  * @returns {Promise<Object>} - Database health status
  */
 const checkDatabaseHealth = async () => {
   try {
+    // First check connection status
+    const conn = await mongoose.connection.db.admin().ping();
+    const isConnected = conn && conn.ok === 1;
+    
     // Get MongoDB stats
     const itemCount = await Item.countDocuments();
     const userCount = await User.countDocuments();
@@ -70,28 +75,55 @@ const checkDatabaseHealth = async () => {
     const resolvedCount = await Item.countDocuments({ status: 'resolved' });
     const expiredCount = await Item.countDocuments({ status: 'expired' });
     
-    // Estimate database size (this is a rough estimation)
-    // In a real app, you might use MongoDB's stats command
-    const avgDocSize = 5; // Average document size in KB
-    const estimatedSizeKB = (itemCount + userCount) * avgDocSize;
+    // Get more detailed MongoDB Atlas metrics
+    let dbStats = {};
+    let mongoVersion = '';
+    let collections = 0;
+    let connections = 0;
+    let sizeInMB = 0;
     
-    // Format the size based on magnitude
-    let size;
-    if (estimatedSizeKB > 1024) {
-      size = `${(estimatedSizeKB / 1024).toFixed(2)} MB`;
-    } else {
-      size = `${estimatedSizeKB.toFixed(2)} KB`;
+    try {
+      // Get MongoDB server info for version
+      const serverInfo = await mongoose.connection.db.admin().serverInfo();
+      mongoVersion = serverInfo.version;
+      
+      // Get database stats for more accurate size information
+      dbStats = await mongoose.connection.db.stats();
+      collections = dbStats.collections;
+      connections = dbStats.connections;
+      
+      // Calculate size in MB more accurately
+      sizeInMB = dbStats.dataSize / (1024 * 1024);
+    } catch (statsErr) {
+      console.log('Could not get detailed MongoDB stats:', statsErr);
+      // Fall back to estimation if detailed stats fail
+      const avgDocSize = 5; // Average document size in KB
+      sizeInMB = (itemCount + userCount) * avgDocSize / 1024;
+      collections = 2; // Assumes at least Users and Items collections
+      connections = 1; // At least one connection (the current one)
     }
     
+    // Get response time (approximation)
+    const startTime = Date.now();
+    await mongoose.connection.db.command({ ping: 1 });
+    const responseTimeMs = Date.now() - startTime;
+    
     return {
-      connected: true,
+      connected: isConnected,
       itemCount,
       userCount,
       oldItemCount,
       activeCount,
       resolvedCount,
       expiredCount,
-      size,
+      size: `${sizeInMB.toFixed(2)} MB`,
+      sizeInMB: parseFloat(sizeInMB.toFixed(2)),
+      version: mongoVersion,
+      collections,
+      connections,
+      responseTimeMs,
+      isAtlas: true, // Assuming we're using MongoDB Atlas
+      clusterName: 'Admin', // The cluster name from user's requirement
       lastCheck: new Date()
     };
   } catch (error) {

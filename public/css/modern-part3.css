@@ -1,0 +1,321 @@
+/* Modern Styles Part 3 - Navigation & Header - Elegant Modern Design */
+
+/* Navbar styling - Luxurious and sophisticated */
+.navbar {
+  padding: 1.25rem 0;
+  background: linear-gradient(to right, var(--dark-color), var(--primary-dark));
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  transition: var(--transition-normal);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navbar-scrolled {
+  padding: 0.5rem 0;
+  backdrop-filter: blur(10px);
+  background: rgba(37, 99, 235, 0.95);
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navbar-brand i {
+  font-size: 1.25rem;
+  background: white;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-right: 0.5rem;
+}
+
+.navbar-brand::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #fff;
+  transition: width 0.3s ease;
+  opacity: 0;
+}
+
+.navbar-brand:hover::after {
+  width: 100%;
+  opacity: 1;
+}
+
+.navbar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  position: relative;
+  transition: var(--transition-normal);
+  margin: 0 0.2rem;
+}
+
+.navbar-nav .nav-link i {
+  transition: var(--transition-normal);
+}
+
+.navbar-nav .nav-link:hover {
+  color: #fff;
+}
+
+.navbar-nav .nav-link:hover i {
+  transform: translateY(-2px);
+}
+
+.navbar-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #fff;
+  transition: width 0.3s ease, left 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.navbar-nav .nav-link:hover::after {
+  width: 80%;
+}
+
+.navbar-toggler {
+  border: none;
+  padding: 0.25rem;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: var(--transition-fast);
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+  outline: none;
+  color: #fff;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* CRITICAL: Force dropdown visibility and fix all positioning issues */
+.navbar.bg-primary,
+.navbar,
+.container,
+body,
+.dropdown,
+.navbar-nav,
+.navbar-collapse {
+  overflow: visible !important;
+}
+
+.dropdown {
+  position: relative !important;
+  z-index: 1030 !important;
+}
+
+.dropdown-menu {
+  position: absolute !important;
+  display: none !important;
+  z-index: 1031 !important;
+  background-color: white !important;
+  border: 1px solid rgba(0,0,0,0.15) !important;
+  border-radius: 0.25rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.175) !important;
+  padding: 0.5rem 0 !important;
+  margin: 0.125rem 0 0 !important;
+  min-width: 10rem !important;
+  left: auto !important;
+  top: 100% !important;
+  transform: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.dropdown-menu.show {
+  display: block !important;
+}
+
+/* Any element that could potentially block dropdown */
+.navbar-brand,
+.navbar-nav,
+.navbar-collapse,
+.navbar-expand-lg,
+.auth-buttons,
+.container {
+  position: static !important;
+  z-index: auto !important;
+}
+
+/* Authentication buttons - Luxurious gold accent */
+.auth-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.auth-buttons .nav-link {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.auth-buttons .login-btn {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.1);
+}
+
+.auth-buttons .signup-btn {
+  background: rgba(210, 180, 140, 0.8); /* Gold-like accent */
+  border: 1px solid rgba(210, 180, 140, 0.5);
+  color: var(--dark-color);
+  box-shadow: 0 4px 10px -2px rgba(0, 0, 0, 0.1);
+}
+
+.auth-buttons .login-btn:hover,
+.auth-buttons .signup-btn:hover {
+  background: rgba(210, 180, 140, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  color: var(--dark-color);
+}
+
+/* Bootstrap default dropdown styling - no custom styling */
+
+/* All dropdown styling removed */
+
+/* Hero section styling - Luxurious and elegant */
+.hero-section, .bg-primary {
+  position: relative;
+  background: var(--dark-color);
+  color: white;
+  padding: 6rem 0;
+  overflow: hidden;
+  border-radius: 0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  border-bottom: 4px solid rgba(210, 180, 140, 0.8); /* Gold accent border */
+}
+
+/* Gold accent line */
+.hero-section::after, .bg-primary::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background: rgba(210, 180, 140, 0.8);
+  margin-bottom: 3px;
+}
+
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 1;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  bottom: -80px;
+  left: -80px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.8));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  max-width: 600px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--border-radius-full);
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+}
+
+.hero-buttons .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .hero-section {
+    padding: 3rem 0;
+  }
+  
+  .hero-buttons .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}

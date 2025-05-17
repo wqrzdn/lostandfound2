@@ -1,0 +1,99 @@
+<div class="container py-4">
+  <!-- Flash messages -->
+  <% if (locals.success_msg) { %>
+    <div class="alert alert-success alert-dismissible fade show">
+      <%= success_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <% if (locals.error_msg) { %>
+    <div class="alert alert-danger alert-dismissible fade show">
+      <%= error_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <% if (locals.info_msg) { %>
+    <div class="alert alert-info alert-dismissible fade show">
+      <%= info_msg %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="mb-3">My Items</h1>
+      <p class="text-muted">Manage all the items you've posted</p>
+    </div>
+    <div class="col-md-4 text-end d-flex align-items-center justify-content-end">
+      <a href="/items/new" class="btn btn-primary">
+        <i class="fas fa-plus-circle me-2"></i> Post New Item
+      </a>
+    </div>
+  </div>
+
+  <% if (items && items.length > 0) { %>
+    <div class="row">
+      <% items.forEach(item => { %>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span class="badge <%= item.type === 'lost' ? 'bg-danger' : 'bg-success' %>">
+                <%= item.type === 'lost' ? 'Lost' : 'Found' %>
+              </span>
+              <small class="text-muted"><%= moment(item.createdAt).format('MMM D, YYYY') %></small>
+            </div>
+            
+            <% if (item.images && item.images.length > 0) { %>
+              <img src="<%= item.images[0] %>" class="card-img-top" alt="<%= item.title %>" style="height: 200px; object-fit: cover;">
+            <% } else { %>
+              <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                <span class="text-muted">No Image</span>
+              </div>
+            <% } %>
+            
+            <div class="card-body">
+              <h5 class="card-title"><%= item.title %></h5>
+              <p class="card-text text-muted">
+                <%= item.description.length > 100 ? item.description.substring(0, 100) + '...' : item.description %>
+              </p>
+              
+              <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-map-marker-alt text-secondary me-2"></i>
+                <small>
+                  <%= item.location || (item.city && item.state ? `${item.city}, ${item.state}` : 'Location not specified') %>
+                </small>
+              </div>
+              
+              <div class="d-flex align-items-center mb-3">
+                <i class="fas fa-tag text-secondary me-2"></i>
+                <small><%= item.category || 'Uncategorized' %></small>
+              </div>
+            </div>
+            
+            <div class="card-footer bg-white">
+              <div class="d-flex justify-content-between">
+                <a href="/items/<%= item._id %>" class="btn btn-sm btn-outline-primary">View Details</a>
+                <div>
+                  <a href="/items/<%= item._id %>/edit" class="btn btn-sm btn-outline-secondary me-1">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form action="/items/<%= item._id %>?_method=DELETE" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this item?')">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="alert alert-info">
+      <h4 class="alert-heading">No Items Found</h4>
+      <p>You haven't posted any items yet.</p>
+      <hr>
+      <p class="mb-0">Click the "Post New Item" button above to get started.</p>
+    </div>
+  <% } %>
+</div>

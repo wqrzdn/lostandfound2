@@ -1,12 +1,12 @@
-<div class="container py-4">
+<div class="container mt-4">
   <!-- User Dashboard Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1><i class="fas fa-tachometer-alt text-primary me-2"></i> My Dashboard</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom dashboard-header">
+    <h1 class="h2 fw-bold"><span class="icon-badge"><i class="fas fa-tachometer-alt"></i></span> My Dashboard</h1>
     <div>
-      <a href="/items/new?type=Lost" class="btn btn-danger me-2">
+      <a href="/items/new?type=Lost" class="btn btn-danger me-2 shadow-sm btn-hover-lift">
         <i class="fas fa-search me-1"></i> Report Lost Item
       </a>
-      <a href="/items/new?type=Found" class="btn btn-success">
+      <a href="/items/new?type=Found" class="btn btn-success shadow-sm btn-hover-lift">
         <i class="fas fa-hand-holding-heart me-1"></i> Report Found Item
       </a>
     </div>
@@ -15,52 +15,52 @@
   <!-- User Quick Stats -->
   <div class="row mb-4 g-3">
     <div class="col-md-3">
-      <div class="card bg-primary text-white h-100">
-        <div class="card-body text-center">
-          <h1 class="display-4"><%= userItems ? userItems.length : 0 %></h1>
+      <div class="card bg-primary text-white h-100 stat-card">
+        <div class="card-body text-center p-4">
+          <h1 class="display-4 fw-bold mb-0"><%= userItems ? userItems.length : 0 %></h1>
           <h5>My Items</h5>
         </div>
-        <div class="card-footer bg-primary text-center" style="background-color: rgba(0,0,0,0.1);">
-          <a href="/items/my-items" class="text-white text-decoration-none">
+        <div class="card-footer text-center border-0" style="background-color: rgba(0,0,0,0.1);">
+          <a href="/items/my-items" class="text-white text-decoration-none fw-medium">
             <i class="fas fa-arrow-right me-1"></i> View All
           </a>
         </div>
       </div>
     </div>
     <div class="col-md-3">
-      <div class="card bg-danger text-white h-100">
-        <div class="card-body text-center">
-          <h1 class="display-4"><%= userLostItems ? userLostItems.length : 0 %></h1>
+      <div class="card bg-danger text-white h-100 stat-card">
+        <div class="card-body text-center p-4">
+          <h1 class="display-4 fw-bold mb-0"><%= userLostItems ? userLostItems.length : 0 %></h1>
           <h5>Lost Items</h5>
         </div>
-        <div class="card-footer bg-danger text-center" style="background-color: rgba(0,0,0,0.1);">
-          <a href="/items/my-items?type=lost" class="text-white text-decoration-none">
+        <div class="card-footer text-center border-0" style="background-color: rgba(0,0,0,0.1);">
+          <a href="/items/my-items?type=lost" class="text-white text-decoration-none fw-medium">
             <i class="fas fa-arrow-right me-1"></i> View Lost
           </a>
         </div>
       </div>
     </div>
     <div class="col-md-3">
-      <div class="card bg-success text-white h-100">
-        <div class="card-body text-center">
-          <h1 class="display-4"><%= userFoundItems ? userFoundItems.length : 0 %></h1>
+      <div class="card bg-success text-white h-100 stat-card">
+        <div class="card-body text-center p-4">
+          <h1 class="display-4 fw-bold mb-0"><%= userFoundItems ? userFoundItems.length : 0 %></h1>
           <h5>Found Items</h5>
         </div>
-        <div class="card-footer bg-success text-center" style="background-color: rgba(0,0,0,0.1);">
-          <a href="/items/my-items?type=found" class="text-white text-decoration-none">
+        <div class="card-footer text-center border-0" style="background-color: rgba(0,0,0,0.1);">
+          <a href="/items/my-items?type=found" class="text-white text-decoration-none fw-medium">
             <i class="fas fa-arrow-right me-1"></i> View Found
           </a>
         </div>
       </div>
     </div>
     <div class="col-md-3">
-      <div class="card bg-info text-white h-100">
-        <div class="card-body text-center">
-          <h1 class="display-4"><%= userResolvedItems ? userResolvedItems.length : 0 %></h1>
+      <div class="card bg-info text-white h-100 stat-card">
+        <div class="card-body text-center p-4">
+          <h1 class="display-4 fw-bold mb-0"><%= userResolvedItems ? userResolvedItems.length : 0 %></h1>
           <h5>Resolved</h5>
         </div>
-        <div class="card-footer bg-info text-center" style="background-color: rgba(0,0,0,0.1);">
-          <a href="/items/my-items?status=resolved" class="text-white text-decoration-none">
+        <div class="card-footer text-center border-0" style="background-color: rgba(0,0,0,0.1);">
+          <a href="/items/my-items?status=resolved" class="text-white text-decoration-none fw-medium">
             <i class="fas fa-arrow-right me-1"></i> View Resolved
           </a>
         </div>
@@ -69,19 +69,19 @@
   </div>
 
   <!-- My Recent Items -->
-  <div class="card mb-4">
-    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-      <h4 class="mb-0"><i class="fas fa-list-alt me-2"></i> My Recent Items</h4>
-      <a href="/items/my-items" class="btn btn-sm btn-primary">
+  <div class="card mb-4 content-card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <h4 class="mb-0 fw-bold"><span class="icon-badge"><i class="fas fa-list-alt"></i></span> My Recent Items</h4>
+      <a href="/items/my-items" class="btn btn-sm btn-primary rounded-pill px-3">
         <i class="fas fa-eye me-1"></i> View All My Items
       </a>
     </div>
     <div class="card-body">
       <% if (userItems && userItems.length > 0) { %>
         <div class="table-responsive">
-          <table class="table table-hover align-middle">
+          <table class="table table-hover align-middle custom-table">
             <thead>
-              <tr>
+              <tr class="table-light">
                 <th>Item</th>
                 <th>Type</th>
                 <th>Category</th>
@@ -97,14 +97,14 @@
                   <td>
                     <div class="d-flex align-items-center">
                       <% if (item.images && item.images.length > 0) { %>
-                        <img src="/uploads/<%= item.images[0] %>" class="rounded me-3" width="50" height="50" style="object-fit: cover;" alt="<%= item.title %>">
+                        <img src="/uploads/<%= item.images[0] %>" class="rounded-lg me-3 item-thumbnail" width="50" height="50" alt="<%= item.title %>">
                       <% } else { %>
-                        <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                        <div class="bg-light rounded-lg me-3 d-flex align-items-center justify-content-center item-thumbnail-placeholder">
                           <i class="fas fa-box text-secondary"></i>
                         </div>
                       <% } %>
                       <div>
-                        <h6 class="mb-0"><%= item.title %></h6>
+                        <h6 class="mb-0 fw-semibold"><%= item.title %></h6>
                         <small class="text-muted"><%= item.description.substring(0, 30) %>...</small>
                       </div>
                     </div>
@@ -118,42 +118,18 @@
                   <td><%= item.location.city %>, <%= item.location.country %></td>
                   <td><%= new Date(item.date).toLocaleDateString() %></td>
                   <td>
-                    <span class="badge bg-<%= item.status === 'active' ? 'primary' : (item.status === 'resolved' ? 'success' : 'secondary') %>">
+                    <span class="badge bg-<%= item.status === 'active' ? 'primary' : (item.status === 'resolved' ? 'success' : 'secondary') %> badge-status">
                       <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
                     </span>
                   </td>
                   <td>
-                    <div class="btn-group btn-group-sm">
-                      <a href="/items/<%= item._id %>" class="btn btn-outline-primary">
+                    <div class="btn-group btn-group-sm action-buttons">
+                      <a href="/items/<%= item._id %>" class="btn btn-outline-primary btn-action">
                         <i class="fas fa-eye"></i>
                       </a>
-                      <a href="/items/<%= item._id %>/edit" class="btn btn-outline-secondary">
+                      <a href="/items/<%= item._id %>/edit" class="btn btn-outline-secondary btn-action">
                         <i class="fas fa-edit"></i>
                       </a>
-                      <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#resolveModal<%= item._id %>">
-                        <i class="fas fa-check"></i>
-                      </button>
-                    </div>
-                    
-                    <!-- Resolve Modal -->
-                    <div class="modal fade" id="resolveModal<%= item._id %>" tabindex="-1" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Mark as Resolved</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <p>Are you sure you want to mark this item as resolved?</p>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <form action="/items/<%= item._id %>/resolve" method="POST">
-                              <button type="submit" class="btn btn-success">Confirm</button>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </td>
                 </tr>
@@ -162,41 +138,41 @@
           </table>
         </div>
       <% } else { %>
-        <div class="alert alert-info">
+        <div class="alert alert-info d-flex align-items-center gap-2">
           <i class="fas fa-info-circle me-2"></i> You haven't posted any items yet. 
-          <a href="/items/new" class="alert-link">Post your first item now</a>.
+          <a href="/items/new" class="alert-link fw-medium">Post your first item now</a>.
         </div>
       <% } %>
     </div>
   </div>
 
   <!-- Potential Matches -->
-  <div class="card mb-4">
-    <div class="card-header bg-light">
-      <h4 class="mb-0"><i class="fas fa-exchange-alt me-2"></i> Potential Matches</h4>
+  <div class="card mb-4 content-card">
+    <div class="card-header bg-white py-3">
+      <h4 class="mb-0 fw-bold"><span class="icon-badge"><i class="fas fa-exchange-alt"></i></span> Potential Matches</h4>
     </div>
     <div class="card-body">
       <% if (potentialMatches && potentialMatches.length > 0) { %>
-        <div class="row g-3">
+        <div class="row g-4">
           <% potentialMatches.forEach(match => { %>
             <div class="col-md-6">
-              <div class="card h-100">
+              <div class="card h-100 match-card">
                 <div class="card-body">
                   <div class="d-flex">
-                    <div class="flex-shrink-0">
+                    <div class="flex-shrink-0 me-3">
                       <% if (match.images && match.images.length > 0) { %>
-                        <img src="/uploads/<%= match.images[0] %>" class="rounded" width="80" height="80" style="object-fit: cover;" alt="<%= match.title %>">
+                        <img src="/uploads/<%= match.images[0] %>" class="rounded-lg match-img" width="80" height="80" alt="<%= match.title %>">
                       <% } else { %>
-                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <div class="bg-light rounded-lg d-flex align-items-center justify-content-center match-img-placeholder">
                           <i class="fas fa-box text-secondary fa-2x"></i>
                         </div>
                       <% } %>
                     </div>
-                    <div class="flex-grow-1 ms-3">
-                      <h5 class="card-title"><%= match.title %></h5>
+                    <div class="flex-grow-1">
+                      <h5 class="card-title fw-bold"><%= match.title %></h5>
                       <p class="card-text text-muted mb-1"><%= match.description.substring(0, 50) %>...</p>
                       <div class="d-flex">
-                        <span class="badge bg-<%= match.type === 'lost' ? 'danger' : 'success' %> me-2">
+                        <span class="badge bg-<%= match.type === 'lost' ? 'danger' : 'success' %> badge-pill me-2">
                           <%= match.type === 'lost' ? 'Lost' : 'Found' %>
                         </span>
                         <small class="text-muted">
@@ -207,8 +183,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="card-footer bg-light">
-                  <a href="/items/<%= match._id %>" class="btn btn-sm btn-primary w-100">
+                <div class="card-footer bg-transparent border-top-0 pt-0">
+                  <a href="/items/<%= match._id %>" class="btn btn-sm btn-primary w-100 btn-hover-lift rounded-pill">
                     <i class="fas fa-eye me-1"></i> View Details
                   </a>
                 </div>
@@ -217,7 +193,7 @@
           <% }); %>
         </div>
       <% } else { %>
-        <div class="alert alert-info">
+        <div class="alert alert-info d-flex align-items-center gap-2">
           <i class="fas fa-info-circle me-2"></i> No potential matches found for your items at this time.
         </div>
       <% } %>
@@ -225,24 +201,24 @@
   </div>
 
   <!-- Recent Activity -->
-  <div class="card mb-4">
-    <div class="card-header bg-light">
-      <h4 class="mb-0"><i class="fas fa-history me-2"></i> Recent Activity</h4>
+  <div class="card mb-4 content-card">
+    <div class="card-header bg-white py-3">
+      <h4 class="mb-0 fw-bold"><span class="icon-badge"><i class="fas fa-history"></i></span> Recent Activity</h4>
     </div>
     <div class="card-body p-0">
-      <div class="list-group list-group-flush">
+      <div class="list-group list-group-flush activity-list">
         <% if (recentActivity && recentActivity.length > 0) { %>
           <% recentActivity.forEach(activity => { %>
-            <a href="<%= activity.link %>" class="list-group-item list-group-item-action">
-              <div class="d-flex w-100 justify-content-between">
-                <h6 class="mb-1"><%= activity.title %></h6>
-                <small class="text-muted"><%= activity.timeAgo %></small>
+            <a href="<%= activity.link %>" class="list-group-item list-group-item-action border-0 py-3">
+              <div class="d-flex w-100 justify-content-between align-items-center">
+                <h6 class="mb-1 fw-semibold"><%= activity.title %></h6>
+                <small class="text-muted badge bg-light text-dark"><%= activity.timeAgo %></small>
               </div>
               <p class="mb-1"><%= activity.description %></p>
             </a>
           <% }); %>
         <% } else { %>
-          <div class="list-group-item">
+          <div class="list-group-item border-0 py-3">
             <i class="fas fa-info-circle me-2"></i> No recent activity to display.
           </div>
         <% } %>
@@ -250,3 +226,168 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* Dashboard styles */
+  .dashboard-header h1 {
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .icon-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
+    color: white;
+    margin-right: 0.75rem;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+  }
+
+  .stat-card {
+    border-radius: 0.75rem;
+    border: none;
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  }
+
+  .content-card {
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+
+  .content-card .card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .btn-hover-lift {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.12);
+  }
+
+  /* Table styling */
+  .custom-table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .custom-table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    color: #64748b;
+  }
+
+  .custom-table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .custom-table tr:hover {
+    background-color: #f8fafc;
+  }
+
+  .badge-status {
+    font-weight: 500;
+    padding: 0.35rem 0.65rem;
+  }
+
+  .item-thumbnail {
+    object-fit: cover;
+    width: 50px;
+    height: 50px;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .item-thumbnail-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+  }
+
+  .action-buttons .btn-action {
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    transition: all 0.15s ease-in-out;
+    margin: 0 2px;
+  }
+
+  .action-buttons .btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Match cards */
+  .match-card {
+    border: none;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  .match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  }
+
+  .match-img {
+    object-fit: cover;
+    width: 80px;
+    height: 80px;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .match-img-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 0.5rem;
+  }
+
+  /* Activity list */
+  .activity-list .list-group-item {
+    transition: all 0.15s ease-in-out;
+    border-left: 3px solid transparent;
+  }
+
+  .activity-list .list-group-item:hover {
+    background-color: #f8fafc;
+    border-left: 3px solid #3b82f6;
+  }
+
+  /* Custom modal styling */
+  .custom-modal .modal-content {
+    border-radius: 0.75rem;
+  }
+
+  .custom-modal .modal-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .custom-modal .modal-body {
+    padding: 1.5rem;
+  }
+
+  .custom-modal .modal-footer {
+    padding: 1.25rem 1.5rem;
+  }
+</style>

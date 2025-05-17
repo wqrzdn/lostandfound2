@@ -18,7 +18,7 @@ module.exports = function(upload) {
   router.get('/', async (req, res) => {
     try {
       // Get filter parameters from query string
-      const { type, category, date, keyword, country, state, city } = req.query;
+      const { type, category, date, keyword, country, state, city, isSchoolArea } = req.query;
       
       // Build filter object
       const filter = {};
@@ -28,6 +28,7 @@ module.exports = function(upload) {
       if (country) filter.country = country;
       if (state) filter.state = state;
       if (city) filter.city = city;
+      if (isSchoolArea === 'true') filter.isSchoolArea = true;
       
       // Text search if keyword provided
       if (keyword) {
@@ -59,6 +60,7 @@ module.exports = function(upload) {
         country,
         state,
         city,
+        isSchoolArea: isSchoolArea || 'false',
         user: req.user,  // Pass user if logged in
         moment
       });
@@ -79,7 +81,10 @@ module.exports = function(upload) {
   
   // Display form to create a new item - Requires login
   router.get('/new', (req, res) => {
-    res.render('items/new', { req });
+    res.render('items/new', { 
+      req,
+      layout: 'layout_new' // Explicitly set layout to match profile page
+    });
   });
   
   // Get user's own items - Requires login
@@ -91,7 +96,8 @@ module.exports = function(upload) {
         
       res.render('items/my-items', {
         items: userItems,
-        moment
+        moment,
+        layout: 'layout_new'
       });
     } catch (error) {
       console.error('Error getting user items:', error);
@@ -178,7 +184,8 @@ module.exports = function(upload) {
       
       res.render('items/edit', {
         item,
-        req
+        req,
+        layout: 'layout_new' // Explicitly set layout to match profile page
       });
     } catch (error) {
       console.error('Error showing edit form:', error);
@@ -346,6 +353,69 @@ module.exports = function(upload) {
       console.log('Request body:', req.body);
       console.log('Files:', req.files ? req.files.length : 0);
       
+      // Check if this is a school/college area submission
+      const isSchoolArea = req.body.isSchoolArea === 'true';
+      
+      if (isSchoolArea) {
+        console.log('Processing school/college area submission');
+        const { 
+          schoolName, schoolLocation, schoolItemDescription, 
+          schoolContact, schoolDate, type 
+        } = req.body;
+        
+        // Validate required fields for school submission
+        if (!schoolName || !schoolLocation || !schoolItemDescription || !schoolContact || !schoolDate || !type) {
+          console.error('School form validation failed - missing required fields');
+          return res.status(400).send('All required fields must be filled');
+        }
+        
+        try {
+          // Create new item document with school-specific data
+          const newItem = new Item({
+            title: `Item in ${schoolName}`,
+            description: schoolItemDescription,
+            category: 'School/College',
+            type: type.toLowerCase(),
+            location: schoolLocation,
+            country: 'School/College Area',
+            state: 'N/A',
+            city: schoolName,
+            date: schoolDate,
+            contact: schoolContact,
+            isSchoolArea: true,
+            schoolName,
+            schoolLocation,
+            user: req.user && req.user._id ? req.user._id : null
+          });
+          
+          console.log('School item document created, saving to database...');
+          
+          // Save item to database
+          const savedItem = await newItem.save();
+          console.log('School item saved successfully with ID:', savedItem._id);
+          
+          // If user is logged in, associate item with user
+          if (req.user && req.user._id) {
+            console.log('Associating item with user:', req.user.email);
+            await User.findByIdAndUpdate(req.user._id, {
+              $push: { items: savedItem._id }
+            });
+          }
+          
+          // Flash success message and redirect
+          req.flash('success', 'School/College item posted successfully');
+          return res.redirect('/items/' + savedItem._id);
+        } catch (innerError) {
+          console.error('Error saving school item:', innerError);
+          req.flash('error', 'Failed to create school item. Please try again.');
+          return res.status(500).render('error', {
+            message: 'Error saving school item',
+            error: innerError
+          });
+        }
+      }
+      
+      // Standard form processing for non-school items
       const { 
         title, description, category, location, 
         countryName, stateName, cityName, locality,

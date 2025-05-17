@@ -70,6 +70,20 @@ const ItemSchema = new mongoose.Schema({
   image1: String,
   image2: String,
 
+  // School/College area specific fields
+  isSchoolArea: {
+    type: Boolean,
+    default: false
+  },
+  schoolName: {
+    type: String,
+    trim: true
+  },
+  schoolLocation: {
+    type: String,
+    trim: true
+  },
+
   // User reference
   user: {
     type: mongoose.Schema.Types.ObjectId,

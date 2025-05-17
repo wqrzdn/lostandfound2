@@ -1,0 +1,96 @@
+/* 
+  Lost & Found - Modern Design System 
+  A comprehensive CSS framework for the Lost & Found website
+  Provides professional, modern aesthetics while maintaining full functionality
+*/
+
+/* Import all component stylesheets */
+@import url('modern-part1.css'); /* Core & Layout */
+@import url('modern-part2.css'); /* Components */
+@import url('modern-part3.css'); /* Navigation & Header */
+@import url('modern-part4.css'); /* Forms, Tables & UI Elements */
+@import url('modern-part5.css'); /* Animations, Effects & Page-Specific Styles */
+
+/* Additional styles for color customization */
+:root {
+  --bs-primary: var(--primary-color);
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-secondary: var(--secondary-color);
+  --bs-secondary-rgb: 79, 70, 229;
+  --bs-success: var(--success-color);
+  --bs-success-rgb: 16, 185, 129;
+  --bs-danger: var(--danger-color);
+  --bs-danger-rgb: 239, 68, 68;
+  --bs-warning: var(--warning-color);
+  --bs-warning-rgb: 245, 158, 11;
+  --bs-info: var(--info-color);
+  --bs-info-rgb: 14, 165, 233;
+}
+
+/* Override some Bootstrap classes for consistent design */
+.text-primary { color: var(--primary-color) !important; }
+.text-secondary { color: var(--secondary-color) !important; }
+.text-success { color: var(--success-color) !important; }
+.text-danger { color: var(--danger-color) !important; }
+.text-warning { color: var(--warning-color) !important; }
+.text-info { color: var(--info-color) !important; }
+
+.bg-primary { background-color: var(--primary-color) !important; }
+.bg-secondary { background-color: var(--secondary-color) !important; }
+.bg-success { background-color: var(--success-color) !important; }
+.bg-danger { background-color: var(--danger-color) !important; }
+.bg-warning { background-color: var(--warning-color) !important; }
+.bg-info { background-color: var(--info-color) !important; }
+.bg-light { background-color: var(--gray-50) !important; }
+.bg-dark { background-color: var(--dark-color) !important; }
+
+/* Typography enhancements */
+h1, .h1 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; }
+h2, .h2 { font-size: 2rem; font-weight: 700; line-height: 1.2; }
+h3, .h3 { font-size: 1.75rem; font-weight: 600; line-height: 1.3; }
+h4, .h4 { font-size: 1.5rem; font-weight: 600; line-height: 1.3; }
+h5, .h5 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; }
+h6, .h6 { font-size: 1rem; font-weight: 600; line-height: 1.4; }
+
+.display-1 { font-size: 5rem; font-weight: 800; line-height: 1.1; }
+.display-2 { font-size: 4.5rem; font-weight: 800; line-height: 1.1; }
+.display-3 { font-size: 4rem; font-weight: 800; line-height: 1.1; }
+.display-4 { font-size: 3.5rem; font-weight: 700; line-height: 1.1; }
+.display-5 { font-size: 3rem; font-weight: 700; line-height: 1.1; }
+.display-6 { font-size: 2.5rem; font-weight: 700; line-height: 1.1; }
+
+/* Fix for any Bootstrap conflicts */
+.form-control:focus, 
+.form-select:focus, 
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25);
+  border-color: var(--primary-color);
+}
+
+.nav-link:focus {
+  color: white;
+}
+
+/* Remove default Bootstrap focus shadows from buttons */
+.btn:focus {
+  box-shadow: none !important;
+}
+
+/* Responsive fixes */
+@media (max-width: 768px) {
+  .display-1 { font-size: 3.5rem; }
+  .display-2 { font-size: 3.25rem; }
+  .display-3 { font-size: 3rem; }
+  .display-4 { font-size: 2.5rem; }
+  .display-5 { font-size: 2rem; }
+  .display-6 { font-size: 1.75rem; }
+  
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .mb-md-0 {
+    margin-bottom: 1rem !important;
+  }
+}

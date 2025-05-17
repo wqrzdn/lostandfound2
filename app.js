@@ -53,7 +53,7 @@ const commonStatesData = {
 // Set up EJS as the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('layout', 'layout'); // Set default layout
+app.set('layout', 'layout_new'); // Set default layout to new layout
 app.use(ejsLayouts);
 
 // Middleware
@@ -365,60 +365,85 @@ const itemsRouter = require('./routes/items_new');  // Using our improved router
 const authRouter = require('./routes/auth');
 const adminRouter = require('./routes/admin');
 const adminItemsRouter = require('./routes/admin_items'); // New dedicated admin item management
+const publicRouter = require('./routes/public'); // Public routes for browsing without login
 
 app.use('/auth', authRouter);
+
+// ALL routes except auth require authentication
+app.use(function(req, res, next) {
+  // Skip authentication for auth routes
+  if (req.path.startsWith('/auth/')) {
+    return next();
+  }
+  
+  // Skip for static resources
+  if (req.path.startsWith('/css/') || 
+      req.path.startsWith('/js/') || 
+      req.path.startsWith('/images/') ||
+      req.path.startsWith('/uploads/')) {
+    return next();
+  }
+  
+  // Apply authentication middleware for all other routes
+  if (!req.user || !req.user._id) {
+    console.log('Access denied: No authenticated user, redirecting to login');
+    
+    // Store the original URL they were trying to access for redirect after login
+    if (req.session) {
+      req.session.returnTo = req.originalUrl;
+    }
+    
+    // Redirect to login page
+    return res.redirect('/auth/login');
+  }
+  
+  // User is authenticated, proceed
+  next();
+});
+
+// Use item routes with upload middleware
 app.use('/items', itemsRouter(upload));
 app.use('/admin', adminRouter);
-app.use('/admin_items', adminItemsRouter); // New dedicated admin item management routes
+app.use('/admin_items', adminItemsRouter);
 
 // Set different layouts based on route
 app.use((req, res, next) => {
   // Set admin layout for admin routes
   if (req.path.startsWith('/admin')) {
     app.set('layout', 'admin_layout');
-    // Override the default render function to ensure admin layout is used
-    const originalRender = res.render;
-    res.render = function(view, options, callback) {
-      options = options || {};
-      // Force the admin layout for all admin views
-      options.layout = 'admin_layout';
-      originalRender.call(this, view, options, callback);
-    };
   } else {
-    // Use default layout for all other routes
+    // Use new layout for all other routes
     app.set('layout', 'layout_new');
   }
   next();
 });
 
-// Auth routes are always public - do not require auth
-app.use('/auth', authRouter);
-
-// Public routes for static files
+// Public routes for static files - these need to be accessible without authentication
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// API routes (needed for filtering to work properly)
-app.use('/api', (req, res, next) => {
-  // Allow API access for authenticated users
-  if (req.user) {
-    next();
-  } else {
-    res.status(401).json({ error: 'Authentication required' });
-  }
+// Root route redirects to items page after authentication
+app.get('/', (req, res) => {
+  res.redirect('/items');
 });
 
-// Role-based redirection middleware
-app.use(redirectByRole);
-
-// ALL other routes require authentication
-app.use('/', requireAuth);
-
-// Items routes
-app.use('/items', itemsRouter(upload));
-
-// Admin routes - require admin role
-app.use('/admin', requireAdmin, adminRouter);
+// Profile route
+app.get('/profile', (req, res) => {
+  try {
+    res.render('profile', { 
+      user: req.user,
+      layout: 'layout_new'
+    });
+  } catch (error) {
+    console.error('Profile route error:', error);
+    res.status(500).render('error', {
+      message: 'Error loading profile',
+      error: error
+    });
+  }
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

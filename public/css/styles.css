@@ -174,4 +174,34 @@ footer {
 .dark-mode .card {
   background-color: #333;
   color: #f8f9fa;
+}
+
+/* Profile Page Specific Styling */
+.profile-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.profile-container .card {
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-container .card-body {
+  padding: 1.5rem;
+}
+
+.profile-container .btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
+}
+
+/* Media query to ensure profile page maintains consistent sizing */
+@media (max-width: 992px) {
+  .profile-container .card {
+    margin-bottom: 1.5rem;
+  }
 } 
+.custom-hero-heading-w { 
+  color: #ffc107; /* 🔶 Change to any color you want, this is Bootstrap's warning yellow */
+}

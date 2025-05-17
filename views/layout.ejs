@@ -14,6 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/modern-design.css">
   <style>
     :root {
       --bs-primary: #3b82f6;
@@ -67,34 +68,15 @@
       font-size: 0.9rem;
     }
     
-    /* Animation for navbar links */
+    /* Remove animation for navbar links */
     .nav-link {
       position: relative;
     }
     
-    .nav-link:after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      display: block;
-      margin-top: 2px;
-      right: 0;
-      background: white;
-      transition: width 0.2s ease;
-    }
-    
-    .nav-link:hover:after {
-      width: 100%;
-      left: 0;
-      background: white;
-    }
-
     /* Authentication buttons styling */
     .auth-buttons .nav-link {
       margin: 0 5px;
       border-radius: 4px;
-      transition: all 0.3s ease;
     }
 
     .auth-buttons .login-btn {
@@ -104,12 +86,6 @@
     .auth-buttons .signup-btn {
       background-color: rgba(255,255,255,0.2);
       border: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .auth-buttons .login-btn:hover, 
-    .auth-buttons .signup-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -152,25 +128,31 @@
               <li><a class="dropdown-item" href="/items?category=Keys"><i class="fas fa-key me-2"></i> Keys</a></li>
               <li><a class="dropdown-item" href="/items?category=ID"><i class="fas fa-id-card me-2"></i> IDs</a></li>
               <li><a class="dropdown-item" href="/items?category=Bag"><i class="fas fa-briefcase me-2"></i> Bags</a></li>
+              <li><a class="dropdown-item" href="/items?category=School/College"><i class="fas fa-graduation-cap text-info me-2"></i> School/College Items</a></li>
             </ul>
           </li>
           <% } %>
 
           <div class="auth-buttons d-flex">
             <% if (typeof user !== 'undefined' && user) { %>
-              <% if (user.role !== 'admin') { %> <!-- Only show for regular users, not admins -->
+              <% if (user.role === 'admin') { %>
+              <li class="nav-item">
+                <a class="nav-link btn btn-outline-light px-3 py-1 mx-1" href="/admin/dashboard"><i class="fas fa-user-shield me-1"></i> Admin</a>
+              </li>
+              <% } %>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="fas fa-user-circle me-1"></i> <%= user.name %>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                  <% if (user.role !== 'admin') { %>
                   <li><a class="dropdown-item" href="/profile"><i class="fas fa-user me-2"></i> My Profile</a></li>
                   <li><a class="dropdown-item" href="/items/my-items"><i class="fas fa-list-alt me-2"></i> My Items</a></li>
                   <li><hr class="dropdown-divider"></li>
+                  <% } %>
                   <li><a class="dropdown-item" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
               </li>
-              <% } %>
             <% } else { %>
               <li class="nav-item">
                 <a class="nav-link login-btn px-3 py-1" href="/auth/login"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
